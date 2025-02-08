@@ -67,7 +67,7 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
     {
       icon: <Users size={24} />,
       title: 'Multi-Level Akses',
-      description: 'Sistem terintegrasi untuk mahasiswa (NPM), operator fakultas, kepala lab, kepala departemen, dan dekan (NIP). Serta masyrakat umum (NIK).'
+      description: 'Sistem terintegrasi untuk mahasiswa (NPM), operator fakultas, kepala lab, kepala departemen, dan dekan (NIP). Serta masyarakat umum (NIK).'
     },
     {
       icon: <Clipboard size={24} />,

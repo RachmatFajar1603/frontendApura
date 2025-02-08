@@ -130,7 +130,7 @@ export function SignUpForm(): React.JSX.Element {
             render={({ field }) => (
               <FormControl error={Boolean(errors.noIdentitas)}>
                 <InputLabel>NIK/NPM</InputLabel>
-                <OutlinedInput {...field} label="NIK" type="number" />
+                <OutlinedInput {...field} label="NIK/NPM" type="text" />
                 {errors.noIdentitas ? <FormHelperText>{errors.noIdentitas.message}</FormHelperText> : null}
               </FormControl>
             )}
@@ -141,8 +141,8 @@ export function SignUpForm(): React.JSX.Element {
             rules={{ required: 'Full Name is required' }}
             render={({ field }) => (
               <FormControl error={Boolean(errors.namaLengkap)}>
-                <InputLabel>Full Name</InputLabel>
-                <OutlinedInput {...field} label="Full Name" />
+                <InputLabel>Nama Lengkap</InputLabel>
+                <OutlinedInput {...field} label="Nama Lengkap" />
                 {errors.namaLengkap ? <FormHelperText>{errors.namaLengkap.message}</FormHelperText> : null}
               </FormControl>
             )}
@@ -159,8 +159,8 @@ export function SignUpForm(): React.JSX.Element {
             }}
             render={({ field }) => (
               <FormControl error={Boolean(errors.email)}>
-                <InputLabel>Email address</InputLabel>
-                <OutlinedInput {...field} label="Email address" type="email" />
+                <InputLabel>Email</InputLabel>
+                <OutlinedInput {...field} label="Email" type="email" />
                 {errors.email ? <FormHelperText>{errors.email.message}</FormHelperText> : null}
               </FormControl>
             )}
@@ -178,8 +178,8 @@ export function SignUpForm(): React.JSX.Element {
             }}
             render={({ field }) => (
               <FormControl error={Boolean(errors.phoneNumber)}>
-                <InputLabel>Phone Number</InputLabel>
-                <OutlinedInput {...field} label="Phone Number" type="tel" />
+                <InputLabel>Nomor Telepon</InputLabel>
+                <OutlinedInput {...field} label="Nomor Telepon" type="tel" />
                 {errors.phoneNumber ? <FormHelperText>{errors.phoneNumber.message}</FormHelperText> : null}
               </FormControl>
             )}
