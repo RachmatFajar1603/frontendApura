@@ -11,7 +11,7 @@ import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Downloa
 
 import api from '@/lib/api';
 import { useDepartemen } from '@/lib/departemen/departemen';
-import { useFasilitas } from '@/lib/fasilitas/fasilitas';
+import { useFasilitasManage } from '@/lib/fasilitas/UseFasilitasManage';
 import { useGedung } from '@/lib/gedung/gedung';
 import { useFasilitasFilter } from '@/contexts/FasilitasContext';
 import { usePopover } from '@/hooks/use-popover';
@@ -33,7 +33,7 @@ function TableHeader() {
     searchQuery,
     setSearchQuery,
   } = useFasilitasFilter();
-  const { fasilitas } = useFasilitas();
+  const { fasilitasManage } = useFasilitasManage();
   const { departemen } = useDepartemen();
   const { gedung } = useGedung();
   const { user } = useUsers();
@@ -42,12 +42,30 @@ function TableHeader() {
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
 
   const getUniqueStatusValues = () => {
-    return ['All', ...Array.from(new Set(fasilitas.map((item: any) => item.statusAset)))];
+    const statusValues = Array.from(new Set(fasilitasManage.map((item) => item.statusAset)));
+    return ['All', ...statusValues.sort()];
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSearchQuery(value); // Akan menggunakan handler yang sudah dimodifikasi dari context
+    setSearchQuery(value);
+  };
+
+  const handleDepartemenChange = (e: any) => {
+    setDepartemenFilter(e.target.value);
+    // Reset related filters when department changes
+    if (e.target.value === 'All') {
+      setGedungFilter('All');
+      setLantaiFilter('All');
+    }
+  };
+
+  const handleGedungChange = (e: any) => {
+    setGedungFilter(e.target.value);
+    // Reset lantai when gedung changes
+    if (e.target.value === 'All') {
+      setLantaiFilter('All');
+    }
   };
 
   const restrictedRoles = ['DEKAN', 'WD2', 'KADEP'];
@@ -108,21 +126,21 @@ function TableHeader() {
                 width: { xs: '100%', sm: 'auto' },
               }}
             >
-              {user?.role && !restrictedRoles.includes(user.role) ? <Button
+              {user?.role && !restrictedRoles.includes(user.role) ? (
+                <Button
                   id="tambah"
                   variant="contained"
                   fullWidth
                   aria-label="tambah"
                   sx={{
-                    bgcolor: '#9a221a',
-                    '&:hover': { bgcolor: '#f04438' },
                     padding: '12px 16px',
                     minWidth: '120px',
                   }}
                   onClick={handleOpen}
                 >
                   Tambah
-                </Button> : null}
+                </Button>
+              ) : null}
               <Button
                 id="export"
                 variant="outlined"
@@ -156,13 +174,13 @@ function TableHeader() {
               width: '100%',
             }}
           >
-            <FormControl sx={{ width: { xs: '100%', md: 200 } }}>
+            <FormControl sx={{ width: { xs: '100%', md: 150 } }}>
               <InputLabel id="departemen-filter-label">Departemen</InputLabel>
               <Select
                 labelId="departemen-filter-label"
                 value={departemenFilter}
                 label="Departemen"
-                onChange={(e) => { setDepartemenFilter(e.target.value); }}
+                onChange={handleDepartemenChange}
                 size="small"
               >
                 <MenuItem value="All">All</MenuItem>
@@ -174,31 +192,33 @@ function TableHeader() {
               </Select>
             </FormControl>
 
-            <FormControl sx={{ width: { xs: '100%', md: 200 } }}>
+            <FormControl sx={{ width: { xs: '100%', md: 150 } }}>
               <InputLabel id="gedung-filter-label">Gedung</InputLabel>
               <Select
                 labelId="gedung-filter-label"
                 value={gedungFilter}
                 label="Gedung"
-                onChange={(e) => { setGedungFilter(e.target.value); }}
+                onChange={handleGedungChange}
                 size="small"
               >
                 <MenuItem value="All">All</MenuItem>
-                {gedung.map((ged) => (
-                  <MenuItem key={ged.id} value={ged.id}>
-                    {ged.nama}
+                {gedung.map((g) => (
+                  <MenuItem key={g.id} value={g.id}>
+                    {g.nama}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
 
-            <FormControl sx={{ width: { xs: '100%', md: 200 } }}>
+            <FormControl sx={{ width: { xs: '100%', md: 150 } }}>
               <InputLabel id="lantai-filter-label">Lantai</InputLabel>
               <Select
                 labelId="lantai-filter-label"
                 value={lantaiFilter}
                 label="Lantai"
-                onChange={(e: any) => { setLantaiFilter(e.target.value); }}
+                onChange={(e) => {
+                  setLantaiFilter(e.target.value);
+                }}
                 size="small"
               >
                 <MenuItem value="All">All</MenuItem>
@@ -208,17 +228,19 @@ function TableHeader() {
               </Select>
             </FormControl>
 
-            <FormControl sx={{ width: { xs: '100%', md: 200 } }}>
+            <FormControl sx={{ width: { xs: '100%', md: 150 } }}>
               <InputLabel id="status-filter-label">Status</InputLabel>
               <Select
                 labelId="status-filter-label"
                 value={statusFilter}
                 label="Status"
-                onChange={(e) => { setStatusFilter(e.target.value); }}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                }}
                 size="small"
               >
-                {getUniqueStatusValues().map((status, index) => (
-                  <MenuItem key={`status-${status}-${index}`} value={status}>
+                {getUniqueStatusValues().map((status) => (
+                  <MenuItem key={status} value={status}>
                     {status}
                   </MenuItem>
                 ))}
@@ -233,9 +255,9 @@ function TableHeader() {
               onChange={handleSearchChange}
               size="small"
               sx={{
-                width: { xs: '100%', md: 200 },
+                width: { xs: '100%', md: 150 },
               }}
-              placeholder="Cari berdasarkan nama peminjam..."
+              placeholder="Cari..."
             />
           </Box>
         </Box>
@@ -245,10 +267,18 @@ function TableHeader() {
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
-        onClose={() => { setSnackbarOpen(false); }}
+        onClose={() => {
+          setSnackbarOpen(false);
+        }}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={() => { setSnackbarOpen(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={() => {
+            setSnackbarOpen(false);
+          }}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>

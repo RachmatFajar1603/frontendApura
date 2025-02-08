@@ -63,13 +63,8 @@ export default function FasilitasTable() {
   } = useFasilitasManage();
   const { gedung } = useGedung();
   const { departemen } = useDepartemen();
-  const {
-    departemenFilter,
-    gedungFilter,
-    lantaiFilter,
-    statusFilter,
-    searchQuery,
-  } = useFasilitasFilter();
+  const { departemenFilter, gedungFilter, lantaiFilter, statusFilter, searchQuery, setFilteredFasilitas } =
+    useFasilitasFilter();
   const { user } = useUsers();
 
   // State untuk modal edit dan data pengguna yang dipilih
@@ -87,16 +82,6 @@ export default function FasilitasTable() {
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
   const allowedRoles = ['ADMIN'];
 
-  const getGedungName = (gedungId: string) => {
-    const foundGedung = gedung.find((g) => g.id === gedungId);
-    return foundGedung ? foundGedung.nama : 'Unknown';
-  };
-
-  const getDepartemenName = (departemenId: string) => {
-    const foundDepartemen = departemen.find((d) => d.id === departemenId);
-    return foundDepartemen ? foundDepartemen.nama : 'Unknown';
-  };
-
   const filteredData = React.useMemo(() => {
     return fasilitasManage.filter((item) => {
       const matchDepartemen = departemenFilter === 'All' || item.departemenId === departemenFilter;
@@ -104,30 +89,34 @@ export default function FasilitasTable() {
       const matchLantai = lantaiFilter === 'All' || Number(item.lantai) === Number(lantaiFilter);
       const matchStatus = statusFilter === 'All' || item.statusAset === statusFilter;
 
-      if (!searchQuery.trim()) return true; // Jika search query kosong, tampilkan semua
+      if (!searchQuery) return matchDepartemen && matchGedung && matchLantai && matchStatus;
 
       const searchTerms = searchQuery
         .toLowerCase()
-        .split(' ')
+        .split(/\s+/)
         .filter((term) => term.length > 0);
 
       const searchableFields = [
-        item.nama,
-        item.kode,
-        item.harga?.toString(),
-        item.statusAset,
-        item.jumlah?.toString(),
+        item.nama?.toLowerCase() || '',
+        item.kode?.toLowerCase() || '',
+        item.statusAset?.toLowerCase() || '',
+        item.departemen?.nama?.toLowerCase() || '',
+        item.gedung?.nama?.toLowerCase() || '',
+        item.harga?.toString() || '',
+        item.jumlah?.toString() || '',
         item.lantai?.toString(),
-        departemen.find((d) => d.id === item.departemenId)?.nama,
-        gedung.find((g) => g.id === item.gedungId)?.nama,
-      ].map((field) => field?.toLowerCase() || '');
+      ];
 
-      // Mencari apakah setiap term ada dalam salah satu field
-      const matchSearch = searchTerms.every((term) => searchableFields.some((field) => field.includes(term)));
+      const matchSearch =
+        searchTerms.length === 0 || searchTerms.every((term) => searchableFields.some((field) => field.includes(term)));
 
       return matchDepartemen && matchGedung && matchLantai && matchStatus && matchSearch;
     });
   }, [fasilitasManage, departemenFilter, gedungFilter, lantaiFilter, statusFilter, searchQuery]);
+
+  React.useEffect(() => {
+    setFilteredFasilitas(filteredData);
+  }, [filteredData, setFilteredFasilitas]);
 
   const currentData = React.useMemo(() => {
     const startIndex = page * rowsPerPage;
@@ -190,7 +179,7 @@ export default function FasilitasTable() {
         }
       } catch (error) {
         console.error('Delete error:', error);
-        setSnackbarMessage(`Terjadi kesalahan saat menghapus fasilitas: ${  (error as Error).message}`);
+        setSnackbarMessage(`Terjadi kesalahan saat menghapus fasilitas: ${(error as Error).message}`);
         setSnackbarSeverity('error');
       } finally {
         setIsDeleting(false);
@@ -267,8 +256,8 @@ export default function FasilitasTable() {
                 <TableCell>{index + 1 + page * rowsPerPage}</TableCell>
                 <TableCell>{fasilitas.kode}</TableCell>
                 <TableCell>{fasilitas.nama}</TableCell>
-                <TableCell>{getDepartemenName(fasilitas.departemenId)}</TableCell>
-                <TableCell>{getGedungName(fasilitas.gedungId)}</TableCell>
+                <TableCell>{fasilitas.departemen?.nama}</TableCell>
+                <TableCell>{fasilitas.gedung?.nama}</TableCell>
                 <TableCell>{fasilitas.lantai}</TableCell>
                 <TableCell>
                   {fasilitas.harga ? `Rp. ${Number(fasilitas.harga).toLocaleString('id-ID')}` : 'N/A'}
@@ -303,11 +292,17 @@ export default function FasilitasTable() {
                   </Box>
                 </TableCell>
                 <TableCell>{fasilitas.jumlah}</TableCell>
-                {user?.role && allowedRoles.includes(user.role) ? <TableCell>
-                    <IconButton onClick={(event) => { handleMenuOpen(event, fasilitas.id); }}>
+                {user?.role && allowedRoles.includes(user.role) ? (
+                  <TableCell>
+                    <IconButton
+                      onClick={(event) => {
+                        handleMenuOpen(event, fasilitas.id);
+                      }}
+                    >
                       <DotsThreeVertical />
                     </IconButton>
-                  </TableCell> : null}
+                  </TableCell>
+                ) : null}
               </TableRow>
             ))}
           </TableBody>
@@ -327,8 +322,20 @@ export default function FasilitasTable() {
 
       {/* Menu untuk aksi edit/delete */}
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-        <MenuItem onClick={() => { handleEditClick(seleectedFasilitasId!); }}>Edit</MenuItem>
-        <MenuItem onClick={() => { handleDeleteClick(seleectedFasilitasId!); }}>Delete</MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleEditClick(seleectedFasilitasId!);
+          }}
+        >
+          Edit
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleDeleteClick(seleectedFasilitasId!);
+          }}
+        >
+          Delete
+        </MenuItem>
       </Menu>
 
       <Dialog open={confirmDeleteOpen} onClose={() => !isDeleting && setConfirmDeleteOpen(false)}>
@@ -339,7 +346,13 @@ export default function FasilitasTable() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => { setConfirmDeleteOpen(false); }} color="primary" disabled={isDeleting}>
+          <Button
+            onClick={() => {
+              setConfirmDeleteOpen(false);
+            }}
+            color="primary"
+            disabled={isDeleting}
+          >
             Batal
           </Button>
           <Button onClick={confirmDelete} color="error" disabled={isDeleting}>
@@ -351,10 +364,18 @@ export default function FasilitasTable() {
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
-        onClose={() => { setSnackbarOpen(false); }}
+        onClose={() => {
+          setSnackbarOpen(false);
+        }}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={() => { setSnackbarOpen(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={() => {
+            setSnackbarOpen(false);
+          }}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
@@ -362,7 +383,9 @@ export default function FasilitasTable() {
       {/* Modal edit pengguna */}
       <EditModal
         open={editModalOpen}
-        handleClose={() => { setEditModalOpen(false); }}
+        handleClose={() => {
+          setEditModalOpen(false);
+        }}
         initialData={selectedFasilitasData} // Data pengguna yang akan diedit
         onSuccess={() => getFasilitasManage(currentPageFasilitasManage, rowsPerPageFasilitasManage)} // Refresh data setelah edit
       />
