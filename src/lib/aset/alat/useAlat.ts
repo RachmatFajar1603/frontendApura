@@ -3,6 +3,16 @@ import { AxiosError } from 'axios';
 
 import api from '@/lib/api';
 
+interface Departemen {
+  id: string;
+  nama: string;
+}
+
+interface Gedung {
+  id: string;
+  nama: string;
+}
+
 interface Alat {
   id: string;
   kode: string;
@@ -10,7 +20,7 @@ interface Alat {
   departemenId: string;
   gedungId: string;
   lantai: number;
-  harga?: number;
+  harga?: string;
   statusAset: string;
   jumlah: number;
   created_at?: string;
@@ -20,6 +30,9 @@ interface Alat {
   laboratorium: string;
   pengawasLab?: any;
   pengawasLabId?: string;
+  qrCode?: any;
+  departemen?: Departemen;
+  gedung?: Gedung;
 }
 
 export const useAlat = () => {
@@ -50,7 +63,7 @@ export const useAlat = () => {
     [currentPage, rowsPerPage]
   );
 
-  const getAlatById = async (id: string) => {
+  const getAlatById = React.useCallback(async (id: string) => {
     setLoading(true);
     try {
       const response = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/alat/${id}`);
@@ -67,9 +80,9 @@ export const useAlat = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const postAlat = async (alatData: Omit<Alat, 'id' | 'created_at' | 'updated_at'>) => {
+  const postAlat = React.useCallback(async (alatData: Omit<Alat, 'id' | 'created_at' | 'updated_at'>) => {
     setLoading(true);
     try {
       const response = await api.post(`${process.env.NEXT_PUBLIC_API_URL}/alat`, alatData);
@@ -83,9 +96,9 @@ export const useAlat = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, rowsPerPage, getAlat]);
 
-  const updateAlat = async (id: string, updatedAlat: Partial<Alat>) => {
+  const updateAlat = React.useCallback(async (id: string, updatedAlat: Partial<Alat>) => {
     setLoading(true);
     try {
       const sanitizedData = {
@@ -112,9 +125,9 @@ export const useAlat = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const deleteAlat = async (ids: string[]) => {
+  const deleteAlat = React.useCallback(async (ids: string[]) => {
     setLoading(true);
     try {
       const response = await api.delete(
@@ -142,7 +155,7 @@ export const useAlat = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [currentPage, rowsPerPage, totalData, getAlat]);
 
   React.useEffect(() => {
     getAlat();
