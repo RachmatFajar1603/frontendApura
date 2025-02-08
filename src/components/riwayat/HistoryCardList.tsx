@@ -36,7 +36,19 @@ const HistoryCardList: React.FC<HistoryCardListProps> = ({ filteredHistoryItems,
                   mb: 2,
                 }}
               >
-                <Typography variant="h6" color="primary" sx={{ fontWeight: 'bold' }}>
+                <Typography
+                  variant="h6"
+                  color={
+                    item.type === 'Peminjaman'
+                      ? 'primary'
+                      : item.type === 'Penyewaan'
+                        ? '#059212'
+                        : item.type === 'Perbaikan'
+                          ? '#211951'
+                          : 'text.secondary'
+                  }
+                  sx={{ fontWeight: 'bold' }}
+                >
                   {item.type}
                 </Typography>
                 {renderStatusChip(item.statusPengajuan, 'statusPengajuan')}
@@ -79,16 +91,21 @@ const HistoryCardList: React.FC<HistoryCardListProps> = ({ filteredHistoryItems,
                   Aset: {item.asetName}
                 </Typography>
 
-                {item.type === 'Penyewaan' && item.totalBiaya ? <Typography variant="body2" color="primary" sx={{ fontWeight: 'bold', mt: 1 }}>
+                {item.type === 'Penyewaan' && item.totalBiaya ? (
+                  <Typography variant="body2" color="primary" sx={{ fontWeight: 'bold', mt: 1 }}>
                     Total Biaya: Rp {item.totalBiaya.toLocaleString()}
-                  </Typography> : null}
+                  </Typography>
+                ) : null}
 
                 <Typography variant="body2" color="text.secondary">
                   {item.type === 'Perbaikan' ? `Deskripsi: ${item.deskripsi}` : `Tujuan: ${item.tujuan}`}
                 </Typography>
 
                 {item.type === 'Perbaikan' && (
-                  <Typography variant="body2" color="text.secondary">
+                  <Typography
+                    variant="body2"
+                    color={item.kondisiAset?.toLowerCase() === 'rusak' ? 'error' : 'text.secondary'}
+                  >
                     Kondisi Aset: {item.kondisiAset}
                   </Typography>
                 )}

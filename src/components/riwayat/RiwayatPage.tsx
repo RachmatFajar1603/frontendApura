@@ -152,18 +152,12 @@ const Riwayat: React.FC = () => {
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setCurrentPage(newPage);
-    getPeminjaman(newPage + 1, rowsPerPage / 3);
-    getPenyewaan(newPage + 1, rowsPerPage / 3);
-    getPerbaikan(newPage + 1, rowsPerPage / 3);
   };
 
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newRowsPerPage = parseInt(event.target.value, 10);
     setRowsPerPage(newRowsPerPage);
     setCurrentPage(0);
-    getPeminjaman(1, newRowsPerPage / 3);
-    getPenyewaan(1, newRowsPerPage / 3);
-    getPerbaikan(1, newRowsPerPage / 3);
   };
 
   const renderStatusChip = (status: string, type: 'statusAset' | 'statusPengajuan') => {
@@ -176,10 +170,13 @@ const Riwayat: React.FC = () => {
         SEDANG_DISEWA: { color: '#388e3c', bgColor: '#e8f5e9' },
         PENYEWAAN_GAGAL: { color: '#d32f2f', bgColor: '#ffebee' },
         PEMINJAMAN_GAGAL: { color: '#d32f2f', bgColor: '#ffebee' },
+        PERBAIKAN_SELESAI: { color: '#1976d2', bgColor: '#e3f2fd' },
       },
       statusPengajuan: {
         DISETUJUI: { color: '#388e3c', bgColor: '#e8f5e9' },
         DITOLAK: { color: '#d32f2f', bgColor: '#ffebee' },
+        PENDING: { color: '#ed6c02', bgColor: '#fff4e5' },
+        SELESAI: { color: '#1976d2', bgColor: '#e3f2fd' },
       },
     };
 
