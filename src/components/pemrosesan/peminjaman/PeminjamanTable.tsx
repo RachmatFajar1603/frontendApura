@@ -87,6 +87,7 @@ export default function PeminjamanTable() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
+  const [secondConfirmDeleteOpen, setSecondConfirmDeleteOpen] = React.useState(false);
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [updateStatusOpen, setUpdateStatusOpen] = React.useState(false);
   const [newStatus, setNewStatus] = React.useState('');
@@ -211,6 +212,11 @@ export default function PeminjamanTable() {
     handleMenuClose();
   };
 
+  const handleFirstConfirmDelete = () => {
+    setConfirmDeleteOpen(false);
+    setSecondConfirmDeleteOpen(true);
+  };
+
   const confirmDelete = async () => {
     if (selectedId) {
       setIsDeleting(true);
@@ -228,7 +234,7 @@ export default function PeminjamanTable() {
         setSnackbarSeverity('success');
       } finally {
         setIsDeleting(false);
-        setConfirmDeleteOpen(false);
+        setSecondConfirmDeleteOpen(false);
         setSnackbarOpen(true);
         setSelectedId(null);
       }
@@ -683,9 +689,7 @@ export default function PeminjamanTable() {
       <Dialog open={confirmDeleteOpen} onClose={() => !isDeleting && setConfirmDeleteOpen(false)}>
         <DialogTitle>Konfirmasi Penghapusan</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Apakah anda yakin ingin menghapus peminjaman ini? Tindakan ini tidak dapat dibatalkan.
-          </DialogContentText>
+          <DialogContentText>Apakah anda yakin ingin menghapus peminjaman ini?</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button
@@ -697,8 +701,32 @@ export default function PeminjamanTable() {
           >
             Batal
           </Button>
+          <Button onClick={handleFirstConfirmDelete} color="error" disabled={isDeleting}>
+            Lanjutkan
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={secondConfirmDeleteOpen} onClose={() => !isDeleting && setSecondConfirmDeleteOpen(false)}>
+        <DialogTitle>Peringatan Penghapusan</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            PERINGATAN: Tindakan ini akan menghapus peminjaman secara permanen dan tidak dapat dibatalkan. Apakah anda
+            benar-benar yakin ingin melanjutkan?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setSecondConfirmDeleteOpen(false);
+            }}
+            color="primary"
+            disabled={isDeleting}
+          >
+            Batal
+          </Button>
           <Button onClick={confirmDelete} color="error" disabled={isDeleting}>
-            {isDeleting ? 'Menghapus...' : 'Hapus'}
+            {isDeleting ? 'Menghapus...' : 'Hapus Permanen'}
           </Button>
         </DialogActions>
       </Dialog>

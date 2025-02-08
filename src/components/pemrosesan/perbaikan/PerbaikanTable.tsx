@@ -60,7 +60,8 @@ interface Values {
 export default function PerbaikanTable() {
   const { perbaikan, totalData, currentPage, getPerbaikan, updatePerbaikanStatus, deletePerbaikan } = usePerbaikan();
 
-  const { departemenFilter, statusPengajuanFilter, statusAsetFilter, searchQuery, setFilteredPerbaikan } = usePerbaikanFilter();
+  const { departemenFilter, statusPengajuanFilter, statusAsetFilter, searchQuery, setFilteredPerbaikan } =
+    usePerbaikanFilter();
 
   const { departemen } = useDepartemen();
   const router = useRouter();
@@ -69,6 +70,7 @@ export default function PerbaikanTable() {
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const [selectedId, setSelectedId] = React.useState<string | null>(null);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
+  const [secondConfirmDeleteOpen, setSecondConfirmDeleteOpen] = React.useState(false);
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [updateStatusOpen, setUpdateStatusOpen] = React.useState(false);
   const [newStatus, setNewStatus] = React.useState('');
@@ -109,11 +111,12 @@ export default function PerbaikanTable() {
         .filter((term) => term.length > 0);
 
       const searchableFields = [
-        item.deskripsi?.toLowerCase()|| '',,
-        item.namaPengaju?.namaLengkap?.toLowerCase()|| '',
-        item.namaPenyetujuPerbaikan?.namaLengkap?.toLowerCase()|| '',
-        item.kondisiAset?.toLowerCase()|| '',
-        item.deskripsiPenolakan?.toLowerCase()|| '',
+        item.deskripsi?.toLowerCase() || '',
+        ,
+        item.namaPengaju?.namaLengkap?.toLowerCase() || '',
+        item.namaPenyetujuPerbaikan?.namaLengkap?.toLowerCase() || '',
+        item.kondisiAset?.toLowerCase() || '',
+        item.deskripsiPenolakan?.toLowerCase() || '',
         getAsetName(item as Values),
         item.Departemen?.nama || '',
       ];
@@ -154,6 +157,11 @@ export default function PerbaikanTable() {
     handleMenuClose();
   };
 
+  const handleFirstConfirmDelete = () => {
+    setConfirmDeleteOpen(false);
+    setSecondConfirmDeleteOpen(true);
+  };
+
   const confirmDelete = async () => {
     if (selectedId) {
       setIsDeleting(true);
@@ -171,7 +179,7 @@ export default function PerbaikanTable() {
         setSnackbarSeverity('success');
       } finally {
         setIsDeleting(false);
-        setConfirmDeleteOpen(false);
+        setSecondConfirmDeleteOpen(false);
         setSnackbarOpen(true);
         setSelectedId(null);
       }
@@ -511,9 +519,7 @@ export default function PerbaikanTable() {
       <Dialog open={confirmDeleteOpen} onClose={() => !isDeleting && setConfirmDeleteOpen(false)}>
         <DialogTitle>Konfirmasi Penghapusan</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Apakah anda yakin ingin menghapus perbaikan ini? Tindakan ini tidak dapat dibatalkan.
-          </DialogContentText>
+          <DialogContentText>Apakah anda yakin ingin menghapus perbaikan ini?</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button
@@ -525,8 +531,32 @@ export default function PerbaikanTable() {
           >
             Batal
           </Button>
+          <Button onClick={handleFirstConfirmDelete} color="error" disabled={isDeleting}>
+            Lanjutkan
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={secondConfirmDeleteOpen} onClose={() => !isDeleting && setSecondConfirmDeleteOpen(false)}>
+        <DialogTitle>Peringatan Penghapusan</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            PERINGATAN: Tindakan ini akan menghapus perbaikan secara permanen dan tidak dapat dibatalkan. Apakah anda
+            benar-benar yakin ingin melanjutkan?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setSecondConfirmDeleteOpen(false);
+            }}
+            color="primary"
+            disabled={isDeleting}
+          >
+            Batal
+          </Button>
           <Button onClick={confirmDelete} color="error" disabled={isDeleting}>
-            {isDeleting ? 'Menghapus...' : 'Hapus'}
+            {isDeleting ? 'Menghapus...' : 'Hapus Permanen'}
           </Button>
         </DialogActions>
       </Dialog>

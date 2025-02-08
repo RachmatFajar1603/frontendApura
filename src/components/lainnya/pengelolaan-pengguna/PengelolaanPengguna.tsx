@@ -61,6 +61,7 @@ export default function PengelolaanPenggunaTable() {
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
   const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
+  const [confirmDeleteFinalOpen, setConfirmDeleteFinalOpen] = React.useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'error'>('success');
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [isResending, setIsResending] = React.useState(false);
@@ -148,6 +149,11 @@ export default function PengelolaanPenggunaTable() {
     handleMenuClose();
   };
 
+  const handleFirstConfirmDelete = () => {
+    setConfirmDeleteOpen(false);
+    setConfirmDeleteFinalOpen(true);
+  };
+
   const confirmDelete = async () => {
     if (selectedUserId) {
       setIsDeleting(true);
@@ -166,6 +172,7 @@ export default function PengelolaanPenggunaTable() {
         setSnackbarSeverity('error');
       } finally {
         setIsDeleting(false);
+        setConfirmDeleteFinalOpen(false);
         setConfirmDeleteOpen(false);
         setSnackbarOpen(true);
         setSelectedUserId(null);
@@ -362,9 +369,7 @@ export default function PengelolaanPenggunaTable() {
       <Dialog open={confirmDeleteOpen} onClose={() => !isDeleting && setConfirmDeleteOpen(false)}>
         <DialogTitle>Konfirmasi Penghapusan</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Apakah Anda yakin ingin menghapus pengguna ini? Tindakan ini tidak dapat dibatalkan.
-          </DialogContentText>
+          <DialogContentText>Apakah Anda yakin ingin menghapus data pengguna ini?</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button
@@ -376,8 +381,32 @@ export default function PengelolaanPenggunaTable() {
           >
             Batal
           </Button>
+          <Button onClick={handleFirstConfirmDelete} color="error" disabled={isDeleting}>
+            Lanjutkan
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={confirmDeleteFinalOpen} onClose={() => !isDeleting && setConfirmDeleteFinalOpen(false)}>
+        <DialogTitle>Peringatan Penghapusan</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            PERINGATAN: Tindakan ini akan menghapus data pengguna secara permanen dan tidak dapat dibatalkan. Apakah
+            Anda benar-benar yakin ingin melanjutkan?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setConfirmDeleteFinalOpen(false);
+            }}
+            color="primary"
+            disabled={isDeleting}
+          >
+            Batal
+          </Button>
           <Button onClick={confirmDelete} color="error" disabled={isDeleting}>
-            {isDeleting ? 'Menghapus...' : 'Hapus'}
+            {isDeleting ? 'Menghapus...' : 'Hapus Permanen'}
           </Button>
         </DialogActions>
       </Dialog>

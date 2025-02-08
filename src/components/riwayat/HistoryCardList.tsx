@@ -20,10 +20,8 @@ const HistoryCardList: React.FC<HistoryCardListProps> = ({ filteredHistoryItems,
               display: 'flex',
               flexDirection: 'column',
               borderRadius: 3,
-              transition: 'transform 0.3s',
               '&:hover': {
-                transform: 'scale(1.02)',
-                boxShadow: 3,
+                boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
               },
             }}
           >
