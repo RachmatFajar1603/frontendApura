@@ -114,15 +114,45 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
       delete updateData.pengawasLabId; // Delete pengawasLabId since we're using pengawasLab.connect
 
       if (initialData) {
-        response = await updateAlat(values.id, updateData);
-      } else {
-        response = await postAlat({
+        // Convert harga to string before updating
+        const finalUpdateData = {
           ...updateData,
+          harga: updateData.harga?.toString(),
+        };
+        response = await updateAlat(values.id, {
+          ...finalUpdateData,
+          departemen: undefined,
+          gedung: undefined,
+          shift: undefined,
+          pengawasLab: undefined,
+          departemenId: values.departemenId,
+          gedungId: values.gedungId,
+          shiftId: values.shiftId,
+          pengawasLabId: values.pengawasLabId,
+        });
+      } else {
+        // Convert harga to string before posting
+        const finalPostData = {
+          ...updateData,
+          harga: updateData.harga?.toString(),
           departemenId: values.departemenId || '',
           gedungId: values.gedungId || '',
           shiftId: values.shiftId || '',
           pengawasLabId: values.pengawasLabId || '',
-        });
+        };
+response = await postAlat({
+  kode: finalPostData.kode,
+  nama: finalPostData.nama,
+  laboratorium: finalPostData.laboratorium,
+  lantai: finalPostData.lantai,
+  harga: finalPostData.harga,
+  statusAset: finalPostData.statusAset,
+  jumlah: finalPostData.jumlah,
+  departemenId: finalPostData.departemenId,
+  gedungId: finalPostData.gedungId, 
+  shiftId: finalPostData.shiftId,
+  pengawasLabId: finalPostData.pengawasLabId
+});
       }
 
       setSnackbar({ open: true, message: 'Data berhasil diperbarui', severity: 'success' });
