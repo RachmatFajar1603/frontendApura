@@ -2,6 +2,25 @@
 
 import React, { createContext, useContext, useState } from 'react';
 
+interface RuanganData {
+  id: string;
+  kode: string;
+  nama: string;
+  departemenId: string;
+  gedungId: string;
+  lantai: number;
+  harga?: string;
+  statusAset: string;
+  jumlah: number;
+  created_at?: string;
+  updated_at?: string;
+  shift?: any;
+  pengawasLab?: any;
+  pengawasLabId?: string;
+  departemen?: any;
+  gedung?: any;
+}
+
 interface RuanganContextType {
   selectedAsset: string;
   setSelectedAsset: (value: string) => void;
@@ -15,8 +34,9 @@ interface RuanganContextType {
   setStatusFilter: (value: string) => void;
   searchQuery: string;
   setSearchQuery: (value: string) => void;
-  filteredData: any[];
-  setFilteredData: (data: any[]) => void;
+  ruangan: RuanganData[];
+  filteredRuangan: RuanganData[];
+  setFilteredRuangan: (value: RuanganData[]) => void;
 }
 
 const RuanganContext = createContext<RuanganContextType | undefined>(undefined);
@@ -28,11 +48,11 @@ export const RuanganProvider: React.FC<{ children: React.ReactNode }> = ({ child
   const [lantaiFilter, setLantaiFilter] = useState<string | number>('All');
   const [statusFilter, setStatusFilter] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
-  const [filteredData, setFilteredData] = useState<any[]>([]);
+  const [ruangan, setRuangan] = useState<RuanganData[]>([]);
+  const [filteredRuangan, setFilteredRuangan] = useState<RuanganData[]>([]);
 
   const handleSearchQuery = (value: string) => {
-    // Trim hanya di awal proses pencarian, bukan menghilangkan semua spasi
-    setSearchQuery(value.trimStart());
+    setSearchQuery(value);
   };
 
   return (
@@ -50,8 +70,9 @@ export const RuanganProvider: React.FC<{ children: React.ReactNode }> = ({ child
         setStatusFilter,
         searchQuery,
         setSearchQuery: handleSearchQuery,
-        filteredData,
-        setFilteredData,
+        ruangan,
+        filteredRuangan,
+        setFilteredRuangan,
       }}
     >
       {children}

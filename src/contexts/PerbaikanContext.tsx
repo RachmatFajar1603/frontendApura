@@ -2,6 +2,31 @@
 
 import React, { createContext, useContext, useState } from 'react';
 
+interface PerbaikanData {
+  id: string;
+  namaPenyetujuPerbaikanId: string;
+  namaPengajuId: string;
+  ruangUmumId?: any;
+  ruangLabId?: any;
+  alatId?: any;
+  fasilitasId?: any;
+  deskripsi: string;
+  kondisiAset: string;
+  departemenId?: string;
+  statusAset: string;
+  statusPengajuan: string;
+  Departemen?: any;
+  RuanganUmum?: any;
+  RuangLab?: any;
+  Alat?: any;
+  Fasilitas?: any;
+  namaPengaju?: any;
+  namaPenyetujuPerbaikan?: any;
+  deskripsiPenolakan?: any;
+  jumlahYangDiPerbaiki?: any;
+  jumlahAsetYangTersedia?: any;
+}
+
 interface PerbaikanContextType {
   departemenFilter: string;
   setDepartemenFilter: (value: string) => void;
@@ -11,9 +36,9 @@ interface PerbaikanContextType {
   setStatusAsetFilter: (value: string) => void;
   searchQuery: string;
   setSearchQuery: (value: string) => void;
-  perbaikan: any[]; // Add proper type
-  filteredPerbaikan: any[]; // Add proper type
-  setFilteredPerbaikan: (value: any[]) => void;
+  perbaikan: PerbaikanData[]; // Add proper type
+  filteredPerbaikan: PerbaikanData[]; // Add proper type
+  setFilteredPerbaikan: (value: PerbaikanData[]) => void;
 }
 
 const PerbaikanContext = createContext<PerbaikanContextType | undefined>(undefined);
@@ -23,10 +48,11 @@ export const PerbaikanProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [statusPengajuanFilter, setStatusPengajuanFilter] = useState<string>('All');
   const [statusAsetFilter, setStatusAsetFilter] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [perbaikan, setPerbaikan] = useState<PerbaikanData[]>([]);
+  const [filteredPerbaikan, setFilteredPerbaikan] = useState<PerbaikanData[]>([]);
 
   const handleSearchQuery = (value: string) => {
-    // Trim hanya di awal proses pencarian, bukan menghilangkan semua spasi
-    setSearchQuery(value.trimStart());
+    setSearchQuery(value);
   };
 
   return (
@@ -40,9 +66,9 @@ export const PerbaikanProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setStatusAsetFilter,
         searchQuery,
         setSearchQuery: handleSearchQuery,
-        perbaikan: [],
-        filteredPerbaikan: [],
-        setFilteredPerbaikan: () => {},
+        perbaikan,
+        filteredPerbaikan,
+        setFilteredPerbaikan,
       }}
     >
       {children}

@@ -2,6 +2,35 @@
 
 import React, { createContext, useContext, useState } from 'react';
 
+interface PeminjamanData {
+  jumlahYangDipinjam: number;
+  id: string;
+  namaPeminjamId: string;
+  namaPenyetujuId: string;
+  tujuan: string;
+  tanggalMulai: string;
+  tanggalSelesai: string;
+  statusAset: string;
+  statusPengajuan: string;
+  created_at?: string;
+  updated_at?: string;
+  ruangUmumId?: string;
+  ruangLabId?: string;
+  alatId?: string;
+  fasilitasId?: any;
+  departemenId?: string;
+  Departemen?: any;
+  namaPeminjam?: any;
+  namaPenyetuju?: any;
+  RuanganUmum?: any;
+  RuangLab?: any;
+  Alat?: any;
+  Fasilitas?: any;
+  ttdPeminjam?: any;
+  deskripsiPenolakan?: any;
+  fasilitasPeminjaman?: any;
+}
+
 interface PeminjamanContextType {
   departemenFilter: string;
   setDepartemenFilter: (value: string) => void;
@@ -11,9 +40,9 @@ interface PeminjamanContextType {
   setStatusAsetFilter: (value: string) => void;
   searchQuery: string;
   setSearchQuery: (value: string) => void;
-  peminjaman: any[]; // Add proper type
-  filteredPeminjaman: any[]; // Add proper type
-  setFilteredPeminjaman: (value: any[]) => void;
+  peminjaman: PeminjamanData[]; // Add proper type
+  filteredPeminjaman: PeminjamanData[]; // Add proper type
+  setFilteredPeminjaman: (value: PeminjamanData[]) => void;
 }
 
 const PeminjamanContext = createContext<PeminjamanContextType | undefined>(undefined);
@@ -23,10 +52,11 @@ export const PeminjamanProvider: React.FC<{ children: React.ReactNode }> = ({ ch
   const [statusPengajuanFilter, setStatusPengajuanFilter] = useState<string>('All');
   const [statusAsetFilter, setStatusAsetFilter] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [peminjaman, setPeminjaman] = useState<PeminjamanData[]>([]);
+  const [filteredPeminjaman, setFilteredPeminjaman] = useState<PeminjamanData[]>([]);
 
   const handleSearchQuery = (value: string) => {
-    // Trim hanya di awal proses pencarian, bukan menghilangkan semua spasi
-    setSearchQuery(value.trimStart());
+    setSearchQuery(value);
   };
 
   return (
@@ -40,9 +70,9 @@ export const PeminjamanProvider: React.FC<{ children: React.ReactNode }> = ({ ch
         setStatusAsetFilter,
         searchQuery,
         setSearchQuery: handleSearchQuery,
-        peminjaman: [],
-        filteredPeminjaman: [],
-        setFilteredPeminjaman: () => {},
+        peminjaman,
+        filteredPeminjaman,
+        setFilteredPeminjaman,
       }}
     >
       {children}

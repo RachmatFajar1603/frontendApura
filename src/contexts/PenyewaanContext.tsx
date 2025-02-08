@@ -2,6 +2,39 @@
 
 import React, { createContext, useContext, useState } from 'react';
 
+interface PenyewaanData {
+  id: string;
+  namaPenyewaId: string;
+  namaPenyetujuSewaId: string;
+  tujuan: string;
+  tanggalMulai: string;
+  tanggalSelesai: string;
+  jamMulai?: string;
+  jamSelesai?: string;
+  statusAset: string;
+  statusPengajuan: string;
+  created_at?: string;
+  updataed_at?: string;
+  ruangUmumId?: string;
+  ruangLabId?: string;
+  alatId?: string;
+  fasilitasId?: any;
+  departemenId?: string;
+  Departemen?: any;
+  namaPenyewa?: any;
+  namaPenyetuju?: any;
+  RuanganUmum?: any;
+  RuangLab?: any;
+  Alat?: any;
+  Fasilitas?: any;
+  jumlahYangDisewa?: any;
+  totalBiaya?: any;
+  buktiPembayaran?: any;
+  ttdPenyewa?: any;
+  deskripsiPenolakan?: any;
+  fasilitasPenyewaan?: any;
+}
+
 interface PenyewaanContextType {
   departemenFilter: string;
   setDepartemenFilter: (value: string) => void;
@@ -11,9 +44,9 @@ interface PenyewaanContextType {
   setStatusAsetFilter: (value: string) => void;
   searchQuery: string;
   setSearchQuery: (value: string) => void;
-  peminjaman: any[]; // Add proper type
-  filteredPenyewaan: any[]; // Add proper type
-  setFilteredPenyewaan: (value: any[]) => void;
+  penyewaan: PenyewaanData[]; // Add proper type
+  filteredPenyewaan: PenyewaanData[]; // Add proper type
+  setFilteredPenyewaan: (value: PenyewaanData[]) => void;
 }
 
 const PenyewaanContext = createContext<PenyewaanContextType | undefined>(undefined);
@@ -23,10 +56,11 @@ export const PenyewaanProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [statusPengajuanFilter, setStatusPengajuanFilter] = useState<string>('All');
   const [statusAsetFilter, setStatusAsetFilter] = useState<string>('All');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [penyewaan, setPenyewaan] = useState<PenyewaanData[]>([]);
+  const [filteredPenyewaan, setFilteredPenyewaan] = useState<PenyewaanData[]>([]);
 
   const handleSearchQuery = (value: string) => {
-    // Trim hanya di awal proses pencarian, bukan menghilangkan semua spasi
-    setSearchQuery(value.trimStart());
+    setSearchQuery(value);
   };
 
   return (
@@ -40,9 +74,9 @@ export const PenyewaanProvider: React.FC<{ children: React.ReactNode }> = ({ chi
         setStatusAsetFilter,
         searchQuery,
         setSearchQuery: handleSearchQuery,
-        peminjaman: [],
-        filteredPenyewaan: [],
-        setFilteredPenyewaan: () => {},
+        penyewaan,
+        filteredPenyewaan,
+        setFilteredPenyewaan,
       }}
     >
       {children}
