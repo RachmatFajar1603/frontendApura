@@ -141,7 +141,9 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
     }
   };
 
-  const handleSnackbarClose = () => { setSnackbar({ ...snackbar, open: false }); };
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   return (
     <>
@@ -395,12 +397,7 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
               <Button onClick={handleClose} variant="outlined" color="error">
                 Batal
               </Button>
-              <Button
-                type="submit"
-                variant="contained"
-                sx={{ bgcolor: '#FFCC28', '&:hover': { bgcolor: '#ffc107' } }}
-                disabled={loading}
-              >
+              <Button type="submit" variant="contained" disabled={loading}>
                 {initialData ? 'Simpan' : 'Tambah'}
               </Button>
             </DialogActions>
@@ -408,9 +405,11 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
         </DialogContent>
 
         {/* Error handling */}
-        {errors.root ? <Alert severity="error" sx={{ mx: 2, mb: 2 }}>
+        {errors.root ? (
+          <Alert severity="error" sx={{ mx: 2, mb: 2 }}>
             {errors.root.message}
-          </Alert> : null}
+          </Alert>
+        ) : null}
       </Dialog>
 
       {/* Snackbar */}

@@ -97,14 +97,16 @@ const Modal: React.FC<AddAssetModalProps> = ({ open, handleClose }) => {
     }
   };
 
-  const handleSnackbarClose = () => { setSnackbar({ ...snackbar, open: false }); };
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   React.useEffect(() => {
     if (user?.role === 'PENGAWAS_LAB') {
       // Disable field pengawasLab dan departemen jika user adalah PENGAWAS_LAB
       const pengawasLabField = document.querySelector('input[name="pengawasLabId"]')!;
       const departemenField = document.querySelector('input[name="departemenId"]')!;
-      
+
       if (pengawasLabField) (pengawasLabField as HTMLInputElement).disabled = true;
       if (departemenField) (departemenField as HTMLInputElement).disabled = true;
     }
@@ -205,12 +207,12 @@ const Modal: React.FC<AddAssetModalProps> = ({ open, handleClose }) => {
             <Controller
               name="jumlah"
               control={control}
-              rules={{ 
+              rules={{
                 required: 'Jumlah diperlukan',
                 pattern: {
                   value: /^[0-9]+$/,
-                  message: 'Hanya angka yang diperbolehkan'
-                }
+                  message: 'Hanya angka yang diperbolehkan',
+                },
               }}
               render={({ field }) => (
                 <TextField
@@ -359,18 +361,15 @@ const Modal: React.FC<AddAssetModalProps> = ({ open, handleClose }) => {
           <Button onClick={handleClose} variant="outlined" color="error">
             Batal
           </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            onClick={handleSubmit(onSubmit)}
-            sx={{ bgcolor: '#FFCC28', '&:hover': { bgcolor: '#ffc107' } }}
-          >
+          <Button type="submit" variant="contained" onClick={handleSubmit(onSubmit)}>
             Tambah
           </Button>
         </DialogActions>
-        {errors.root ? <Alert severity="error" sx={{ mx: 2, mb: 2 }}>
+        {errors.root ? (
+          <Alert severity="error" sx={{ mx: 2, mb: 2 }}>
             {errors.root.message}
-          </Alert> : null}
+          </Alert>
+        ) : null}
       </Dialog>
 
       {/* Snackbar Notification */}

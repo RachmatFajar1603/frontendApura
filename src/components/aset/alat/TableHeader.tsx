@@ -1,18 +1,7 @@
 'use client';
 
 import React from 'react';
-import {
-  Alert,
-  Card,
-  debounce,
-  Divider,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Snackbar,
-  Typography,
-} from '@mui/material';
+import { Alert, Card, Divider, FormControl, InputLabel, MenuItem, Select, Snackbar, Typography } from '@mui/material';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
@@ -23,17 +12,27 @@ import api from '@/lib/api';
 import { useAlatManage } from '@/lib/aset/alat/UseAlatManage';
 import { useDepartemen } from '@/lib/departemen/departemen';
 import { useGedung } from '@/lib/gedung/gedung';
+import { useAlatFilter } from '@/contexts/AlatContext';
 import { usePopover } from '@/hooks/use-popover';
 import { useUsers } from '@/hooks/use-user';
 
 import Modal from './modal';
 
-type StatusOption = 'TERSEDIA' | 'TIDAK_TERSEDIA' | 'DIPERBAIKI';
-
 function TableHeader() {
+  const {
+    departemenFilter,
+    setDepartemenFilter,
+    gedungFilter,
+    setGedungFilter,
+    lantaiFilter,
+    setLantaiFilter,
+    statusFilter,
+    setStatusFilter,
+    searchQuery,
+    setSearchQuery,
+  } = useAlatFilter();
+  const { alatManage } = useAlatManage();
   const { open, handleOpen, handleClose } = usePopover();
-
-  const { handleFilter, filters } = useAlatManage();
   const { departemen } = useDepartemen();
   const { gedung } = useGedung();
   const { user } = useUsers();
@@ -41,45 +40,47 @@ function TableHeader() {
   const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'error'>('success');
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
 
-  const statusOptions: StatusOption[] = ['TERSEDIA', 'TIDAK_TERSEDIA', 'DIPERBAIKI'];
+  const getUniqueStatusValues = () => {
+    const statusValues = Array.from(new Set(alatManage.map((item) => item.statusAset)));
+    return ['All', ...statusValues.sort()];
+  };
 
-  // Update handler filter
-  const handleFilterChange = (type: 'search' | 'exact', field: string, value: string) => {
-    const filterMap: Record<string, string> = {
-      departemen: 'departemenId',
-      gedung: 'gedungId',
-      lantai: 'lantai',
-      status: 'StatusAset',
-    };
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setSearchQuery(value);
+  };
 
-    const actualField = filterMap[field] || field;
-
-    if (value === 'All') {
-      handleFilter(type, actualField, '');
-    } else {
-      handleFilter(type, actualField, value);
+  const handleDepartemenChange = (e: any) => {
+    setDepartemenFilter(e.target.value);
+    // Reset related filters when department changes
+    if (e.target.value === 'All') {
+      setGedungFilter('All');
+      setLantaiFilter('All');
     }
   };
 
-  // Update search handler
-  const debouncedSearch = debounce((value: string) => {
-    handleFilter('search', 'nama', value);
-  }, 500);
+  const handleGedungChange = (e: any) => {
+    setGedungFilter(e.target.value);
+    // Reset lantai when gedung changes
+    if (e.target.value === 'All') {
+      setLantaiFilter('All');
+    }
+  };
 
   const restrictedRoles = ['DEKAN', 'WD2', 'KADEP'];
 
   const handleExport = async () => {
     try {
       const response = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/alat/export/excel`, {
-        responseType: 'blob', // Specify that we expect a Blob response
+        responseType: 'blob',
       });
       if (!response.data) {
         throw new Error('Failed to export data');
       }
-      const url = window.URL.createObjectURL(response.data); // Use response.data directly
+      const url = window.URL.createObjectURL(response.data);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', 'alat_data.xlsx'); // Set the file name
+      link.setAttribute('download', 'alat_data.xlsx');
       document.body.appendChild(link);
       link.click();
       link.remove();
@@ -125,21 +126,21 @@ function TableHeader() {
                 width: { xs: '100%', sm: 'auto' },
               }}
             >
-              {user?.role && !restrictedRoles.includes(user.role) ? <Button
+              {user?.role && !restrictedRoles.includes(user.role) ? (
+                <Button
                   id="tambah"
                   variant="contained"
                   fullWidth
                   aria-label="tambah"
                   sx={{
-                    bgcolor: '#9a221a',
-                    '&:hover': { bgcolor: '#f04438' },
                     padding: '12px 16px',
                     minWidth: '120px',
                   }}
                   onClick={handleOpen}
                 >
                   Tambah
-                </Button> : null}
+                </Button>
+              ) : null}
               <Button
                 id="export"
                 variant="outlined"
@@ -173,13 +174,13 @@ function TableHeader() {
               width: '100%',
             }}
           >
-            <FormControl sx={{ width: { xs: '100%', md: 200 } }}>
+            <FormControl sx={{ width: { xs: '100%', md: 150 } }}>
               <InputLabel id="departemen-filter-label">Departemen</InputLabel>
               <Select
                 labelId="departemen-filter-label"
-                value={filters.exact.departemenId || 'All'}
+                value={departemenFilter}
                 label="Departemen"
-                onChange={(e) => { handleFilterChange('exact', 'departemen', e.target.value); }}
+                onChange={handleDepartemenChange}
                 size="small"
               >
                 <MenuItem value="All">All</MenuItem>
@@ -191,31 +192,33 @@ function TableHeader() {
               </Select>
             </FormControl>
 
-            <FormControl sx={{ width: { xs: '100%', md: 200 } }}>
+            <FormControl sx={{ width: { xs: '100%', md: 150 } }}>
               <InputLabel id="gedung-filter-label">Gedung</InputLabel>
               <Select
                 labelId="gedung-filter-label"
-                value={filters.exact.gedungId || 'All'}
+                value={gedungFilter}
                 label="Gedung"
-                onChange={(e) => { handleFilterChange('exact', 'gedung', e.target.value); }}
+                onChange={handleGedungChange}
                 size="small"
               >
                 <MenuItem value="All">All</MenuItem>
-                {gedung.map((ged) => (
-                  <MenuItem key={ged.id} value={ged.id}>
-                    {ged.nama}
+                {gedung.map((g) => (
+                  <MenuItem key={g.id} value={g.id}>
+                    {g.nama}
                   </MenuItem>
                 ))}
               </Select>
             </FormControl>
 
-            <FormControl sx={{ width: { xs: '100%', md: 200 } }}>
+            <FormControl sx={{ width: { xs: '100%', md: 150 } }}>
               <InputLabel id="lantai-filter-label">Lantai</InputLabel>
               <Select
                 labelId="lantai-filter-label"
-                value={filters.exact.lantai || 'All'}
+                value={lantaiFilter}
                 label="Lantai"
-                onChange={(e) => { handleFilterChange('exact', 'lantai', e.target.value); }}
+                onChange={(e) => {
+                  setLantaiFilter(e.target.value);
+                }}
                 size="small"
               >
                 <MenuItem value="All">All</MenuItem>
@@ -225,17 +228,18 @@ function TableHeader() {
               </Select>
             </FormControl>
 
-            <FormControl sx={{ width: { xs: '100%', md: 200 } }}>
+            <FormControl sx={{ width: { xs: '100%', md: 150 } }}>
               <InputLabel id="status-filter-label">Status</InputLabel>
               <Select
                 labelId="status-filter-label"
-                value={filters.exact.StatusAset || 'All'}
+                value={statusFilter}
                 label="Status"
-                onChange={(e) => { handleFilterChange('exact', 'statusAset', e.target.value); }}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                }}
                 size="small"
               >
-                <MenuItem value="All">All</MenuItem>
-                {statusOptions.map((status) => (
+                {getUniqueStatusValues().map((status) => (
                   <MenuItem key={status} value={status}>
                     {status}
                   </MenuItem>
@@ -247,11 +251,13 @@ function TableHeader() {
               id="search-query"
               label="Cari"
               variant="outlined"
-              defaultValue={filters.search.nama || ''}
-              onChange={(e) => { debouncedSearch(e.target.value); }}
+              value={searchQuery}
+              onChange={handleSearchChange}
               size="small"
-              sx={{ width: { xs: '100%', md: 200 } }}
-              placeholder="Cari berdasarkan nama..."
+              sx={{
+                width: { xs: '100%', md: 150 },
+              }}
+              placeholder="Cari..."
             />
           </Box>
         </Box>
@@ -260,10 +266,18 @@ function TableHeader() {
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
-        onClose={() => { setSnackbarOpen(false); }}
+        onClose={() => {
+          setSnackbarOpen(false);
+        }}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={() => { setSnackbarOpen(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={() => {
+            setSnackbarOpen(false);
+          }}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>

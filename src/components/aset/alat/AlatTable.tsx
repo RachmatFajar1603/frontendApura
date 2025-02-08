@@ -26,11 +26,11 @@ import {
   Typography,
 } from '@mui/material';
 import { DotsThreeVertical } from '@phosphor-icons/react/dist/ssr/DotsThreeVertical';
+import { DownloadSimple } from '@phosphor-icons/react/dist/ssr/DownloadSimple';
 
 import { useAlat } from '@/lib/aset/alat/useAlat';
 import { useAlatManage } from '@/lib/aset/alat/UseAlatManage';
-import { useDepartemen } from '@/lib/departemen/departemen';
-import { useGedung } from '@/lib/gedung/gedung';
+import { useAlatFilter } from '@/contexts/AlatContext';
 import { useUsers } from '@/hooks/use-user';
 
 import EditModal from './EditModal';
@@ -47,6 +47,10 @@ interface Values {
   jumlah: number;
   shift?: any;
   laboratorium: string;
+  pengawasLab?: any;
+  departemen?: any;
+  gedung?: any;
+  qrCode?: any;
 }
 
 export default function AlatTable() {
@@ -56,13 +60,11 @@ export default function AlatTable() {
     alatManage,
     loadingAlatManage,
     errorAlatManage,
-    pagination,
-    handlePageChange,
-    handleRowsPerPageChange,
+    currentPageAlatManage,
+    rowsPerPageAlatManage,
   } = useAlatManage();
+  const { departemenFilter, gedungFilter, lantaiFilter, statusFilter, searchQuery, setFilteredAlat } = useAlatFilter();
 
-  const { gedung } = useGedung();
-  const { departemen } = useDepartemen();
   const { user } = useUsers();
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
@@ -74,6 +76,59 @@ export default function AlatTable() {
   const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'error'>('success');
   const [isDeleting, setIsDeleting] = React.useState(false);
+  const [qrCodeDialogOpen, setQrCodeDialogOpen] = React.useState(false);
+  const [selectedQrCode, setSelectedQrCode] = React.useState<string | null>(null);
+
+  const [page, setPage] = React.useState(0);
+  const [rowsPerPage, setRowsPerPage] = React.useState(10);
+
+  const filteredData = React.useMemo(() => {
+    return alatManage.filter((item) => {
+      const matchDepartemen = departemenFilter === 'All' || item.departemenId === departemenFilter;
+      const matchGedung = gedungFilter === 'All' || item.gedungId === gedungFilter;
+      const matchLantai = lantaiFilter === 'All' || Number(item.lantai) === Number(lantaiFilter);
+      const matchStatus = statusFilter === 'All' || item.statusAset === statusFilter;
+
+      if (!searchQuery) return matchDepartemen && matchGedung && matchLantai && matchStatus;
+
+      const searchTerms = searchQuery
+        .toLowerCase()
+        .split(/\s+/)
+        .filter((term) => term.length > 0);
+
+      const searchableFields = [
+        item.nama?.toLowerCase() || '',
+        item.pengawasLab?.namaLengkap?.toLowerCase() || '',
+        item.kode?.toLowerCase() || '',
+        item.laboratorium?.toLowerCase() || '',
+        item.statusAset?.toLowerCase() || '',
+        item.departemen?.nama?.toLowerCase() || '',
+        item.gedung?.nama?.toLowerCase() || '',
+        item.shift?.namaShift?.toLowerCase() || '',
+        item.harga?.toString() || '',
+        item.jumlah?.toString() || '',
+      ];
+
+      const matchSearch =
+        searchTerms.length === 0 || searchTerms.every((term) => searchableFields.some((field) => field.includes(term)));
+
+      return matchDepartemen && matchGedung && matchLantai && matchStatus && matchSearch;
+    });
+  }, [alatManage, departemenFilter, gedungFilter, lantaiFilter, statusFilter, searchQuery]);
+
+  React.useEffect(() => {
+    setFilteredAlat(filteredData);
+  }, [filteredData, setFilteredAlat]);
+
+  const currentData = React.useMemo(() => {
+    const startIndex = page * rowsPerPage;
+    return filteredData.slice(startIndex, startIndex + rowsPerPage);
+  }, [filteredData, page, rowsPerPage]);
+
+  const handleQrCodeClick = (qrCode: string) => {
+    setSelectedQrCode(qrCode);
+    setQrCodeDialogOpen(true);
+  };
 
   const allowedRoles = ['ADMIN', 'PENGAWAS_LAB', 'KALAB'];
 
@@ -86,13 +141,19 @@ export default function AlatTable() {
     setAnchorEl(null);
   };
 
-  const handleServerPageChange = (newPage: number) => {
-    handlePageChange(newPage + 1);
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
   };
 
-  // const handleServerRowsPerPageChange = (newRows: number) => {
-  //   handleRowsPerPageChange(newRows);
-  // };
+  // Handle rows per page change
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  React.useEffect(() => {
+    setPage(0);
+  }, [departemenFilter, gedungFilter, lantaiFilter, statusFilter, searchQuery]);
 
   const handleEditClick = (alatId: string) => {
     const alatToEdit = alatManage.find((item) => item.id === alatId);
@@ -117,10 +178,7 @@ export default function AlatTable() {
         if (response && response.message === 'Successfully deleted Alat!') {
           setSnackbarMessage('Alat berhasil dihapus!');
           setSnackbarSeverity('success');
-          await getAlatManage({
-            page: pagination.currentPage,
-            rows: pagination.rowsPerPage,
-          });
+          await getAlatManage(currentPageAlatManage, rowsPerPageAlatManage);
         } else {
           throw new Error(response.message || 'Unexpected response from server');
         }
@@ -139,9 +197,9 @@ export default function AlatTable() {
 
   if (loadingAlatManage) {
     return (
-      <div style={{ display: 'flex', justifyContent: 'center', marginTop: '2rem' }}>
+      <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
         <CircularProgress />
-      </div>
+      </Box>
     );
   }
 
@@ -152,16 +210,6 @@ export default function AlatTable() {
       </Typography>
     );
   }
-
-  const getGedungName = (gedungId: string) => {
-    const foundGedung = gedung.find((g) => g.id === gedungId);
-    return foundGedung ? foundGedung.nama : 'Unknown';
-  };
-
-  const getDepartemenName = (departemenId: string) => {
-    const foundDepartemen = departemen.find((d) => d.id === departemenId);
-    return foundDepartemen ? foundDepartemen.nama : 'Unknown';
-  };
 
   return (
     <>
@@ -207,19 +255,20 @@ export default function AlatTable() {
               <TableCell>Status</TableCell>
               <TableCell>Jumlah</TableCell>
               <TableCell>Shift</TableCell>
+              <TableCell>QR Code</TableCell>
               {user?.role && allowedRoles.includes(user.role) ? <TableCell>Aksi</TableCell> : null}
             </TableRow>
           </TableHead>
           <TableBody>
-            {alatManage.map((item, index) => (
+            {currentData.map((item, index) => (
               <TableRow key={item.id}>
-                <TableCell>{(pagination.currentPage - 1) * pagination.rowsPerPage + index + 1}</TableCell>
+                <TableCell>{index + 1 + page * rowsPerPage}</TableCell>
                 <TableCell>{item.pengawasLab?.namaLengkap || '-'}</TableCell>
                 <TableCell>{item.kode}</TableCell>
                 <TableCell>{item.nama}</TableCell>
                 <TableCell>{item.laboratorium}</TableCell>
-                <TableCell>{getDepartemenName(item.departemenId)}</TableCell>
-                <TableCell>{getGedungName(item.gedungId)}</TableCell>
+                <TableCell>{item.departemen?.nama}</TableCell>
+                <TableCell>{item.gedung?.nama}</TableCell>
                 <TableCell>{item.lantai}</TableCell>
                 <TableCell>{item.harga ? `Rp ${Number(item.harga).toLocaleString('id-ID')}` : 'N/A'}</TableCell>
                 <TableCell>
@@ -254,6 +303,17 @@ export default function AlatTable() {
                     {item.shift?.jamMulai} - {item.shift?.jamSelesai}
                   </Typography>
                 </TableCell>
+                <TableCell>
+                  {item.qrCode ? (
+                    <IconButton onClick={() => handleQrCodeClick(item.qrCode)} title="Lihat QR Code">
+                      <DownloadSimple />
+                    </IconButton>
+                  ) : (
+                    <Typography variant="body2" color="text.secondary">
+                      Tidak ada QR Code
+                    </Typography>
+                  )}
+                </TableCell>
                 {user?.role && allowedRoles.includes(user.role) ? (
                   <TableCell>
                     <IconButton
@@ -271,15 +331,11 @@ export default function AlatTable() {
         </Table>
         <TablePagination
           component="div"
-          count={pagination.totalData}
-          page={pagination.currentPage - 1} // Konversi ke 0-based
-          onPageChange={(_, newPage) => {
-            handleServerPageChange(newPage);
-          }}
-          rowsPerPage={pagination.rowsPerPage}
-          onRowsPerPageChange={(e) => {
-            handleRowsPerPageChange(parseInt(e.target.value, 10));
-          }}
+          count={filteredData.length}
+          page={page}
+          onPageChange={handleChangePage}
+          rowsPerPage={rowsPerPage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
           rowsPerPageOptions={[5, 10, 25]}
           labelDisplayedRows={({ from, to, count }) => `${from}-${to} dari ${count}`}
           labelRowsPerPage="Baris per halaman:"
@@ -302,6 +358,24 @@ export default function AlatTable() {
           Delete
         </MenuItem>
       </Menu>
+
+      <Dialog open={qrCodeDialogOpen} onClose={() => setQrCodeDialogOpen(false)} maxWidth="sm" fullWidth>
+        <DialogTitle>QR Code Data Aset Alat</DialogTitle>
+        <DialogContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 3 }}>
+          {selectedQrCode && (
+            <img
+              src={selectedQrCode.startsWith('data:image') ? selectedQrCode : `data:image/png;base64,${selectedQrCode}`}
+              alt="QR Code"
+              style={{ width: '300px', height: '300px' }}
+            />
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setQrCodeDialogOpen(false)} color="primary">
+            Tutup
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       <Dialog open={confirmDeleteOpen} onClose={() => !isDeleting && setConfirmDeleteOpen(false)}>
         <DialogTitle>Konfirmasi Penghapusan</DialogTitle>
@@ -351,12 +425,7 @@ export default function AlatTable() {
           setEditModalOpen(false);
         }}
         initialData={selectedAlatData}
-        onSuccess={() =>
-          getAlatManage({
-            page: pagination.currentPage,
-            rows: pagination.rowsPerPage,
-          })
-        } // Refresh data setelah edit
+        onSuccess={() => getAlatManage(currentPageAlatManage, rowsPerPageAlatManage)} // Refresh data setelah edit
       />
     </>
   );

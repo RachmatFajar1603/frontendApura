@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata } from 'next';
 
 import { config } from '@/config';
+import { AlatProvider } from '@/contexts/AlatContext';
 import AlatTable from '@/components/aset/alat/AlatTable';
 import TableHeader from '@/components/aset/alat/TableHeader';
 
@@ -12,10 +13,10 @@ export const metadata = {
 
 function AsetAlatPage() {
   return (
-    <>
+    <AlatProvider>
       <TableHeader />
       <AlatTable />
-    </>
+    </AlatProvider>
   );
 }
 
