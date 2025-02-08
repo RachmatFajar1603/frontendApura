@@ -83,10 +83,13 @@ const Modal: React.FC<AddAssetModalProps> = ({ open, handleClose }) => {
       const dataToSubmit = {
         ...values,
         jumlah: Number(values.jumlah),
-        harga: values.harga ? Number(values.harga.replace(/,/g, '')) : undefined,
+        harga: values.harga ? Number(values.harga.replace(/Rp |,/g, '')) : undefined
       };
 
-      await postAlat(dataToSubmit);
+      await postAlat({
+        ...dataToSubmit,
+        harga: dataToSubmit.harga
+      });
       setSnackbar({ open: true, message: 'Alat berhasil ditambahkan', severity: 'success' });
       reset();
       handleClose();

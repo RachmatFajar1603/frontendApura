@@ -20,7 +20,7 @@ interface Alat {
   departemenId: string;
   gedungId: string;
   lantai: number;
-  harga?: string;
+  harga?: number;
   statusAset: string;
   jumlah: number;
   created_at?: string;

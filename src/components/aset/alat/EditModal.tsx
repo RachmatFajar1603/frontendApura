@@ -129,6 +129,7 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
           gedungId: values.gedungId,
           shiftId: values.shiftId,
           pengawasLabId: values.pengawasLabId,
+          harga: finalUpdateData.harga ? Number(finalUpdateData.harga) : undefined
         });
       } else {
         // Convert harga to string before posting
@@ -140,19 +141,19 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
           shiftId: values.shiftId || '',
           pengawasLabId: values.pengawasLabId || '',
         };
-response = await postAlat({
-  kode: finalPostData.kode,
-  nama: finalPostData.nama,
-  laboratorium: finalPostData.laboratorium,
-  lantai: finalPostData.lantai,
-  harga: finalPostData.harga,
-  statusAset: finalPostData.statusAset,
-  jumlah: finalPostData.jumlah,
-  departemenId: finalPostData.departemenId,
-  gedungId: finalPostData.gedungId, 
-  shiftId: finalPostData.shiftId,
-  pengawasLabId: finalPostData.pengawasLabId
-});
+        response = await postAlat({
+          kode: finalPostData.kode,
+          nama: finalPostData.nama,
+          laboratorium: finalPostData.laboratorium,
+          lantai: finalPostData.lantai,
+          harga: finalPostData.harga ? Number(finalPostData.harga) : undefined,
+          statusAset: finalPostData.statusAset,
+          jumlah: finalPostData.jumlah,
+          departemenId: finalPostData.departemenId,
+          gedungId: finalPostData.gedungId,
+          shiftId: finalPostData.shiftId,
+          pengawasLabId: finalPostData.pengawasLabId
+        });
       }
 
       setSnackbar({ open: true, message: 'Data berhasil diperbarui', severity: 'success' });
