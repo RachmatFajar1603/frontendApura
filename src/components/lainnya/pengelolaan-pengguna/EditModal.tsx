@@ -138,7 +138,9 @@ const EditModal: React.FC<AddAssetModalProps> = ({ open, handleClose, initialDat
     }
   };
 
-  const handleSnackbarClose = () => { setSnackbar({ ...snackbar, open: false }); };
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   return (
     <>
@@ -191,7 +193,8 @@ const EditModal: React.FC<AddAssetModalProps> = ({ open, handleClose, initialDat
                 </TextField>
               )}
             />
-            {shouldShowDepartment ? <Controller
+            {shouldShowDepartment ? (
+              <Controller
                 name="departemenId"
                 control={control}
                 rules={{ required: shouldShowDepartment ? 'Departemen diperlukan' : false }}
@@ -212,7 +215,8 @@ const EditModal: React.FC<AddAssetModalProps> = ({ open, handleClose, initialDat
                     ))}
                   </TextField>
                 )}
-              /> : null}
+              />
+            ) : null}
             <Controller
               name="password"
               control={control}
@@ -230,9 +234,19 @@ const EditModal: React.FC<AddAssetModalProps> = ({ open, handleClose, initialDat
                   margin="normal"
                   InputProps={{
                     endAdornment: showPassword ? (
-                      <EyeIcon cursor="pointer" onClick={() => { setShowPassword(false); }} />
+                      <EyeIcon
+                        cursor="pointer"
+                        onClick={() => {
+                          setShowPassword(false);
+                        }}
+                      />
                     ) : (
-                      <EyeSlashIcon cursor="pointer" onClick={() => { setShowPassword(true); }} />
+                      <EyeSlashIcon
+                        cursor="pointer"
+                        onClick={() => {
+                          setShowPassword(true);
+                        }}
+                      />
                     ),
                   }}
                 />
@@ -243,7 +257,7 @@ const EditModal: React.FC<AddAssetModalProps> = ({ open, handleClose, initialDat
               <Button onClick={handleClose} variant="outlined" color="error">
                 Batal
               </Button>
-              <Button type="submit" variant="contained" sx={{ bgcolor: '#FFCC28', '&:hover': { bgcolor: '#ffc107' } }}>
+              <Button type="submit" variant="contained">
                 {initialData ? 'Simpan' : 'Tambah'}
               </Button>
             </DialogActions>
@@ -251,9 +265,11 @@ const EditModal: React.FC<AddAssetModalProps> = ({ open, handleClose, initialDat
         </DialogContent>
 
         {/* Error handling */}
-        {errors.root ? <Alert severity="error" sx={{ mx: 2, mb: 2 }}>
+        {errors.root ? (
+          <Alert severity="error" sx={{ mx: 2, mb: 2 }}>
             {errors.root.message}
-          </Alert> : null}
+          </Alert>
+        ) : null}
       </Dialog>
 
       {/* Snackbar */}

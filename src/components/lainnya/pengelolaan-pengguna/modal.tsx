@@ -101,7 +101,9 @@ const Modal: React.FC<AddAssetModalProps> = ({ open, handleClose }) => {
     }
   };
 
-  const handleSnackbarClose = () => { setSnackbar({ ...snackbar, open: false }); };
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   return (
     <>
@@ -153,7 +155,8 @@ const Modal: React.FC<AddAssetModalProps> = ({ open, handleClose }) => {
                 </TextField>
               )}
             />
-            {shouldShowDepartment ? <Controller
+            {shouldShowDepartment ? (
+              <Controller
                 name="departemenId"
                 control={control}
                 rules={{ required: shouldShowDepartment ? 'Departemen diperlukan' : false }}
@@ -174,7 +177,8 @@ const Modal: React.FC<AddAssetModalProps> = ({ open, handleClose }) => {
                     ))}
                   </TextField>
                 )}
-              /> : null}
+              />
+            ) : null}
             <Controller
               name="password"
               control={control}
@@ -190,9 +194,19 @@ const Modal: React.FC<AddAssetModalProps> = ({ open, handleClose }) => {
                   margin="normal"
                   InputProps={{
                     endAdornment: showPassword ? (
-                      <EyeIcon cursor="pointer" onClick={() => { setShowPassword(false); }} />
+                      <EyeIcon
+                        cursor="pointer"
+                        onClick={() => {
+                          setShowPassword(false);
+                        }}
+                      />
                     ) : (
-                      <EyeSlashIcon cursor="pointer" onClick={() => { setShowPassword(true); }} />
+                      <EyeSlashIcon
+                        cursor="pointer"
+                        onClick={() => {
+                          setShowPassword(true);
+                        }}
+                      />
                     ),
                   }}
                 />
@@ -204,18 +218,15 @@ const Modal: React.FC<AddAssetModalProps> = ({ open, handleClose }) => {
           <Button onClick={handleClose} variant="outlined" color="error">
             Batal
           </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            onClick={handleSubmit(onSubmit)}
-            sx={{ bgcolor: '#FFCC28', '&:hover': { bgcolor: '#ffc107' } }}
-          >
+          <Button type="submit" variant="contained" onClick={handleSubmit(onSubmit)}>
             Tambah
           </Button>
         </DialogActions>
-        {errors.root ? <Alert severity="error" sx={{ mx: 2, mb: 2 }}>
+        {errors.root ? (
+          <Alert severity="error" sx={{ mx: 2, mb: 2 }}>
             {errors.root.message}
-          </Alert> : null}
+          </Alert>
+        ) : null}
       </Dialog>
 
       <Snackbar

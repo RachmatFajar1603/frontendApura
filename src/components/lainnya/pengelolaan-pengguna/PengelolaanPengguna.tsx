@@ -49,7 +49,7 @@ interface Values {
 export default function PengelolaanPenggunaTable() {
   const { users, loading, error, getUser, currentPage, deleteUser } = useUser();
 
-  const { departemenFilter, roleFilter, searchQuery } = usePengelolaanPenggunaFilter();
+  const { departemenFilter, roleFilter, searchQuery, setFilteredPengelolaanPengguna } = usePengelolaanPenggunaFilter();
 
   const { departemen } = useDepartemen();
 
@@ -72,30 +72,34 @@ export default function PengelolaanPenggunaTable() {
   const filteredData = React.useMemo(() => {
     return users.filter((item) => {
       const matchDepartemen = departemenFilter === 'All' || item.departemenId === departemenFilter;
-      const matchRole = roleFilter === 'All' || item.role === roleFilter;
+      const matchRole = roleFilter === 'ALL' || item.role === roleFilter;
 
-      if (!searchQuery.trim()) return true; // Jika search query kosong, tampilkan semua
+      if (!searchQuery) return matchDepartemen && matchRole;
 
       const searchTerms = searchQuery
         .toLowerCase()
-        .split(' ')
+        .split(/\s+/)
         .filter((term) => term.length > 0);
 
       const searchableFields = [
-        item.namaLengkap,
-        item.noIdentitas,
-        item.email,
-        item.phoneNumber,
-        item.role,
-        departemen.find((d) => d.id === item.departemenId)?.nama,
-      ].map((field) => field?.toLowerCase() || '');
+        item.namaLengkap?.toLowerCase() || '',
+        item.noIdentitas?.toLowerCase() || '',
+        item.email?.toLowerCase() || '',
+        item.phoneNumber?.toLowerCase() || '',
+        item.role?.toLowerCase() || '',
+        item.departemen?.nama?.toLowerCase() || '',
+      ];
 
-      // Mencari apakah setiap term ada dalam salah satu field
-      const matchSearch = searchTerms.every((term) => searchableFields.some((field) => field.includes(term)));
+      const matchSearch =
+        searchTerms.length === 0 || searchTerms.every((term) => searchableFields.some((field) => field.includes(term)));
 
       return matchDepartemen && matchRole && matchSearch;
     });
   }, [users, departemenFilter, roleFilter, searchQuery]);
+
+  React.useEffect(() => {
+    setFilteredPengelolaanPengguna(filteredData);
+  }, [filteredData, setFilteredPengelolaanPengguna]);
 
   const currentData = React.useMemo(() => {
     const startIndex = page * rowsPerPage;
@@ -158,7 +162,7 @@ export default function PengelolaanPenggunaTable() {
         }
       } catch (error) {
         console.error('Delete error:', error);
-        setSnackbarMessage(`Terjadi kesalahan saat menghapus pengguna: ${  (error as Error).message}`);
+        setSnackbarMessage(`Terjadi kesalahan saat menghapus pengguna: ${(error as Error).message}`);
         setSnackbarSeverity('error');
       } finally {
         setIsDeleting(false);
@@ -292,7 +296,11 @@ export default function PengelolaanPenggunaTable() {
                   </Box>
                 </TableCell>
                 <TableCell>
-                  <IconButton onClick={(event) => { handleMenuOpen(event, user.id); }}>
+                  <IconButton
+                    onClick={(event) => {
+                      handleMenuOpen(event, user.id);
+                    }}
+                  >
                     <DotsThreeVertical />
                   </IconButton>
                 </TableCell>
@@ -315,7 +323,8 @@ export default function PengelolaanPenggunaTable() {
 
       {/* Menu untuk aksi edit/delete */}
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-        {selectedUserId && users.find((user) => user.id === selectedUserId && !user.isVerified) ? <MenuItem
+        {selectedUserId && users.find((user) => user.id === selectedUserId && !user.isVerified) ? (
+          <MenuItem
             onClick={() => {
               const userData = users.find((user) => user.id === selectedUserId);
               if (userData) {
@@ -332,9 +341,22 @@ export default function PengelolaanPenggunaTable() {
             ) : (
               'Resend Email Verifikasi'
             )}
-          </MenuItem> : null}
-        <MenuItem onClick={() => { handleEditClick(selectedUserId!); }}>Edit</MenuItem>
-        <MenuItem onClick={() => { handleDeleteClick(selectedUserId!); }}>Delete</MenuItem>
+          </MenuItem>
+        ) : null}
+        <MenuItem
+          onClick={() => {
+            handleEditClick(selectedUserId!);
+          }}
+        >
+          Edit
+        </MenuItem>
+        <MenuItem
+          onClick={() => {
+            handleDeleteClick(selectedUserId!);
+          }}
+        >
+          Delete
+        </MenuItem>
       </Menu>
 
       <Dialog open={confirmDeleteOpen} onClose={() => !isDeleting && setConfirmDeleteOpen(false)}>
@@ -345,7 +367,13 @@ export default function PengelolaanPenggunaTable() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => { setConfirmDeleteOpen(false); }} color="primary" disabled={isDeleting}>
+          <Button
+            onClick={() => {
+              setConfirmDeleteOpen(false);
+            }}
+            color="primary"
+            disabled={isDeleting}
+          >
             Batal
           </Button>
           <Button onClick={confirmDelete} color="error" disabled={isDeleting}>
@@ -357,10 +385,18 @@ export default function PengelolaanPenggunaTable() {
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
-        onClose={() => { setSnackbarOpen(false); }}
+        onClose={() => {
+          setSnackbarOpen(false);
+        }}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={() => { setSnackbarOpen(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={() => {
+            setSnackbarOpen(false);
+          }}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
@@ -368,7 +404,9 @@ export default function PengelolaanPenggunaTable() {
       {/* Modal edit pengguna */}
       <EditModal
         open={editModalOpen}
-        handleClose={() => { setEditModalOpen(false); }}
+        handleClose={() => {
+          setEditModalOpen(false);
+        }}
         initialData={selectedUserData} // Data pengguna yang akan diedit
         onSuccess={() => getUser(currentPage, rowsPerPage)} // Refresh data setelah edit
       />

@@ -22,12 +22,31 @@ function TableHeader() {
   const { departemen } = useDepartemen();
 
   const getUniqueRoleValues = () => {
-    return ['All', ...Array.from(new Set(users.map((item: any) => item.role)))];
+    const uniqueRole = Array.from(new Set(users.map((item: any) => item.role)));
+    return ['ALL', ...uniqueRole.sort()];
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSearchQuery(value); // Akan menggunakan handler yang sudah dimodifikasi dari context
+    setSearchQuery(value);
+  };
+
+  const handleDepartemenChange = (e: any) => {
+    const newDepartemenValue = e.target.value;
+    setDepartemenFilter(newDepartemenValue);
+    // Reset role filter only when switching to 'All' department
+    if (newDepartemenValue === 'All') {
+      setRoleFilter('ALL');
+    }
+  };
+
+  const handleRoleChange = (e: any) => {
+    const newRoleValue = e.target.value;
+    setRoleFilter(newRoleValue);
+    // Only reset department filter when selecting 'ALL' role
+    if (newRoleValue === 'ALL') {
+      setDepartemenFilter('All');
+    }
   };
 
   return (
@@ -66,8 +85,6 @@ function TableHeader() {
                 fullWidth
                 aria-label="tambah"
                 sx={{
-                  bgcolor: '#9a221a',
-                  '&:hover': { bgcolor: '#f04438' },
                   padding: '12px 16px',
                   minWidth: '120px',
                 }}
@@ -99,19 +116,18 @@ function TableHeader() {
               width: '100%',
             }}
           >
-            <FormControl sx={{ width: { xs: '100%', md: 200 } }}>
+            <FormControl sx={{ width: { xs: '100%', md: 150 } }}>
               <InputLabel id="departemen-filter-label">Departemen</InputLabel>
               <Select
                 labelId="departemen-filter-label"
                 value={departemenFilter}
                 label="Departemen"
-                onChange={(e: any) => { setDepartemenFilter(e.target.value); }}
+                onChange={handleDepartemenChange}
                 size="small"
               >
                 <MenuItem value="All">All</MenuItem>
                 {departemen.map((dept) => (
                   <MenuItem key={dept.id} value={dept.id}>
-                    {' '}
                     {dept.nama}
                   </MenuItem>
                 ))}
@@ -124,11 +140,11 @@ function TableHeader() {
                 labelId="role-filter-label"
                 value={roleFilter}
                 label="Role"
-                onChange={(e: any) => { setRoleFilter(e.target.value); }}
+                onChange={handleRoleChange}
                 size="small"
               >
-                {getUniqueRoleValues().map((role, index) => (
-                  <MenuItem key={`role-${role}-${index}`} value={role}>
+                {getUniqueRoleValues().map((role) => (
+                  <MenuItem key={role} value={role}>
                     {role}
                   </MenuItem>
                 ))}
@@ -143,9 +159,9 @@ function TableHeader() {
               onChange={handleSearchChange}
               size="small"
               sx={{
-                width: { xs: '100%', md: 200 },
+                width: { xs: '100%', md: 150 },
               }}
-              placeholder="Cari berdasarkan nama peminjam..."
+              placeholder="Cari..."
             />
           </Box>
         </Box>
