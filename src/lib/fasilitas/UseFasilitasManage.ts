@@ -27,7 +27,7 @@ export const useFasilitasManage = () => {
   const [rowsPerPageFasilitasManage, setRowsPerPageFasilitasManage] = React.useState<number>(10);
 
   const getFasilitasManage = React.useCallback(
-    async (page = currentPageFasilitasManage, rows = rowsPerPageFasilitasManage) => {
+    async (page = currentPageFasilitasManage, rows = totalDataFasilitasManage) => {
       setLoadingFasilitasManage(true);
       try {
         const response = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/fasilitas/manage`);

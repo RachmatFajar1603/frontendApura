@@ -46,7 +46,7 @@ export const usePenyewaan = () => {
   const [penyewaanById, setPenyewaanById] = React.useState<Penyewaan | null>(null);
 
   const getPenyewaan = React.useCallback(
-    async (page = currentPage, rows = rowsPerPage) => {
+    async (page = currentPage, rows = totalData) => {
       setLoading(true);
       try {
         const response = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/penyewaan?page=${page}&rows=${rows}`);
@@ -71,12 +71,11 @@ export const usePenyewaan = () => {
 
       if (response.data?.content) {
         setPenyewaanById(response.data.content);
-        return response.data.content; 
-      } 
-        console.error('Data peminjaman tidak ditemukan');
-        setPenyewaanById(null);
-        return null;
-      
+        return response.data.content;
+      }
+      console.error('Data penyewaan tidak ditemukan');
+      setPenyewaanById(null);
+      return null;
     } catch (error) {
       setError(error instanceof AxiosError ? error.message : 'An unknown error occurred');
       console.error('Error fetching peminjaman by ID:', error);
@@ -115,10 +114,13 @@ export const usePenyewaan = () => {
     }
   };
 
-  const updatePenyewaanStatus = async (id:string, updatePenyewaanStatus: Partial<Penyewaan>) => {
-    setLoading(true)
-    try{
-      const response = await api.put(`${process.env.NEXT_PUBLIC_API_URL}/penyewaan/${id}/statusPenyewaan`, updatePenyewaanStatus);
+  const updatePenyewaanStatus = async (id: string, updatePenyewaanStatus: Partial<Penyewaan>) => {
+    setLoading(true);
+    try {
+      const response = await api.put(
+        `${process.env.NEXT_PUBLIC_API_URL}/penyewaan/${id}/statusPenyewaan`,
+        updatePenyewaanStatus
+      );
       await getPenyewaan(currentPage, rowsPerPage);
       return response.data;
     } catch (error) {
@@ -126,7 +128,7 @@ export const usePenyewaan = () => {
     } finally {
       setLoading(false);
     }
-  }
+  };
 
   const deletePenyewaan = async (ids: string[]) => {
     setLoading(true);

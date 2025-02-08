@@ -18,6 +18,8 @@ interface RuanganLabManage {
   shift?: any;
   pengawasLab?: any;
   pengawasLabId?: string;
+  departemen?: any;
+  gedung?: any;
 }
 
 export const useRuanganLabManage = () => {
@@ -29,7 +31,7 @@ export const useRuanganLabManage = () => {
   const [rowsPerPageRuanganLabManage, setRowsPerPageRuanganLabManage] = React.useState<number>(10);
 
   const getRuanganLabManage = React.useCallback(
-    async (page = currentPageRuanganLabManage, rows = rowsPerPageRuanganLabManage) => {
+    async (page = currentPageRuanganLabManage, rows = totalDataRuanganLabManage) => {
       setLoadingRuanganLabManage(true);
       try {
         const response = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/ruang-lab/manage?page=${page}&rows=${rows}`);

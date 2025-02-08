@@ -1,5 +1,17 @@
 import React from 'react';
+import { AxiosError } from 'axios';
+
 import api from '@/lib/api';
+
+interface Departemen {
+  id: string;
+  nama: string;
+}
+
+interface Gedung {
+  id: string;
+  nama: string;
+}
 
 interface AlatManage {
   id: string;
@@ -18,139 +30,56 @@ interface AlatManage {
   laboratorium: string;
   pengawasLab?: any;
   pengawasLabId?: string;
-}
-
-interface FilterParams {
-  page?: number;
-  rows?: number;
-  searchFilters?: Record<string, any>;
-  filters?: Record<string, any>;
+  qrCode?: any;
+  departemen?: Departemen;
+  gedung?: Gedung;
 }
 
 export const useAlatManage = () => {
   const [alatManage, setAlatManage] = React.useState<AlatManage[]>([]);
   const [loadingAlatManage, setLoadingAlatManage] = React.useState(true);
   const [errorAlatManage, setErrorAlatManage] = React.useState<string | null>(null);
-  const [pagination, setPagination] = React.useState({
-    totalData: 0,
-    totalPage: 1,
-    currentPage: 1,
-    rowsPerPage: 10,
-  });
-
-  const [filters, setFilters] = React.useState<{
-    search: Record<string, any>;
-    exact: Record<string, any>;
-  }>({
-    search: {},
-    exact: {},
-  });
-
-  // Build query parameters dengan handling default values
-  const buildQueryParams = (params: FilterParams) => {
-    const query = new URLSearchParams({
-      page: params.page?.toString() || '1',
-      rows: params.rows?.toString() || '10',
-      searchFilters: JSON.stringify(params.searchFilters || {}),
-      filters: JSON.stringify(params.filters || {}),
-    });
-
-    return query.toString();
-  };
+  const [totalDataAlatManage, setTotalDataAlatManage] = React.useState<number>(0);
+  const [currentPageAlatManage, setCurrentPageAlatManage] = React.useState<number>(1);
+  const [rowsPerPageAlatManage, setRowsPerPageAlatManage] = React.useState<number>(10);
 
   const getAlatManage = React.useCallback(
-    async (params?: Partial<FilterParams>) => {
+    async (page = currentPageAlatManage, rows = totalDataAlatManage) => {
       setLoadingAlatManage(true);
-      setErrorAlatManage(null);
-      
       try {
-        const mergedParams = {
-          page: pagination.currentPage,
-          rows: pagination.rowsPerPage,
-          searchFilters: filters.search,
-          filters: filters.exact,
-          ...params,
-        };
-  
-        const queryParams = buildQueryParams(mergedParams);
-        const response = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/alat/manage?${queryParams}`);
-  
-        // Pertahankan handling struktur response
-        const content = response.data?.content || {};
-        const entries = content.alat?.entries || content.entries || [];
-        const totalData = content.alat?.totalData ?? content.totalData ?? 0;
-        const totalPage = content.alat?.totalPage ?? content.totalPage ?? 1;
-  
+        const response = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/alat/manage?page=${page}&rows=${rows}`);
+        const data = response.data;
+
+        const entries = data.content.entries || data.content.alat?.entries;
+        const totalData = data.content.totalData || data.content.alat?.totalData;
+
         setAlatManage(entries);
-        setPagination(prev => ({
-          ...prev,
-          totalData,
-          totalPage,
-          currentPage: mergedParams.page || 1,
-          rowsPerPage: mergedParams.rows || 10,
-        }));
-  
+        setTotalDataAlatManage(totalData);
+        setCurrentPageAlatManage(page);
+        setRowsPerPageAlatManage(rows);
         return response.data;
       } catch (error) {
-        // ... (bagian error handling tetap sama)
+        setErrorAlatManage(error instanceof AxiosError ? error.message : 'An unknown error occurred');
       } finally {
         setLoadingAlatManage(false);
       }
     },
-    [pagination.currentPage, pagination.rowsPerPage, filters]
+    [currentPageAlatManage, rowsPerPageAlatManage]
   );
 
-  // Handler untuk pagination
-  const handlePageChange = (newPage: number) => {
-    setPagination(prev => ({ ...prev, currentPage: newPage }));
-    getAlatManage({ page: newPage });
-  };
-
-  // Handler untuk rows per page
-  const handleRowsPerPageChange = (newRows: number) => {
-    setPagination(prev => ({
-      ...prev,
-      rowsPerPage: newRows,
-      currentPage: 1,
-    }));
-    getAlatManage({ rows: newRows, page: 1 });
-  };
-
-  // Handler untuk filter
-  const handleFilter = (type: 'search' | 'exact', field: string, value: any) => {
-    setFilters(prev => ({
-      ...prev,
-      [type]: { ...prev[type], [field]: value },
-    }));
-    setPagination(prev => ({ ...prev, currentPage: 1 }));
-    getAlatManage({ 
-      [type === 'search' ? 'searchFilters' : 'filters']: { [field]: value },
-      page: 1 
-    });
-  };
-
-  // Handler reset semua filter
-  const resetFilters = () => {
-    setFilters({ search: {}, exact: {} });
-    setPagination(prev => ({ ...prev, currentPage: 1 }));
-    getAlatManage({ searchFilters: {}, filters: {}, page: 1 });
-  };
-
-  // Auto-fetch saat perubahan pagination atau filter
   React.useEffect(() => {
     getAlatManage();
-  }, [pagination.currentPage, pagination.rowsPerPage, filters]);
+  }, [getAlatManage]);
 
   return {
     alatManage,
     loadingAlatManage,
     errorAlatManage,
-    pagination,
-    filters,
     getAlatManage,
-    handlePageChange,
-    handleRowsPerPageChange,
-    handleFilter,
-    resetFilters,
+    totalDataAlatManage,
+    currentPageAlatManage,
+    rowsPerPageAlatManage,
+    setCurrentPageAlatManage,
+    setRowsPerPageAlatManage,
   };
 };

@@ -38,7 +38,7 @@ export const usePerbaikan = () => {
   const [perbaikanById, setPerbaikanById] = React.useState<Perbaikan | null>(null);
 
   const getPerbaikan = React.useCallback(
-    async (page = currentPage, rows = rowsPerPage) => {
+    async (page = currentPage, rows = totalData) => {
       setLoading(true);
       try {
         const response = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/perbaikan?page=${page}&rows=${rows}`);

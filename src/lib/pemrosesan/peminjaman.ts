@@ -42,7 +42,7 @@ export const usePeminjaman = () => {
   const [peminjamanById, setPeminjamanById] = React.useState<Peminjaman | null>(null);
 
   const getPeminjaman = React.useCallback(
-    async (page = currentPage, rows = rowsPerPage) => {
+    async (page = currentPage, rows = totalData) => {
       setLoading(true);
       try {
         const response = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/peminjaman?page=${page}&rows=${rows}`);
@@ -68,11 +68,10 @@ export const usePeminjaman = () => {
       if (response.data?.content) {
         setPeminjamanById(response.data.content);
         return response.data.content;
-      } 
-        console.error('Data peminjaman tidak ditemukan');
-        setPeminjamanById(null);
-        return null;
-      
+      }
+      console.error('Data peminjaman tidak ditemukan');
+      setPeminjamanById(null);
+      return null;
     } catch (error) {
       setError(error instanceof AxiosError ? error.message : 'An unknown error occurred');
       console.error('Error fetching peminjaman by ID:', error);

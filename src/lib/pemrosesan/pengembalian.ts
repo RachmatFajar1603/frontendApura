@@ -41,7 +41,7 @@ export const usePengembalian = () => {
   const [pengembalianById, setPengembalianById] = React.useState<Pengembalian | null>(null);
 
   const getPengembalian = React.useCallback(
-    async (page = currentPage, rows = rowsPerPage) => {
+    async (page = currentPage, rows = totalData) => {
       setLoading(true);
       try {
         const response = await api.get(`${process.env.NEXT_PUBLIC_API_URL}/pengembalian?page=${page}&rows=${rows}`);

@@ -18,6 +18,8 @@ interface RuanganUmumManage {
   shift?: any;
   pengawasLab?: any;
   pengawasLabId?: string;
+  departemen?: any;
+  gedung?: any;
 }
 
 export const useRuanganUmumManage = () => {
@@ -29,7 +31,7 @@ export const useRuanganUmumManage = () => {
   const [rowsPerPageRuanganUmumManage, setRowsPerPageRuanganUmumManage] = React.useState<number>(10);
 
   const getRuanganUmumManage = React.useCallback(
-    async (page = currentPageRuanganUmumManage, rows = rowsPerPageRuanganUmumManage) => {
+    async (page = currentPageRuanganUmumManage, rows = totalDataRuanganUmumManage) => {
       setLoadingRuanganUmumManage(true);
       try {
         const response = await api.get(
