@@ -41,7 +41,7 @@ import { SkipForward } from '@phosphor-icons/react/dist/ssr/SkipForward';
 import dayjs, { type Dayjs } from 'dayjs';
 
 import { useDepartemen } from '@/lib/departemen/departemen';
-import { type Fasilitas, useFasilitas } from '@/lib/fasilitas/fasilitas';
+import { useFasilitas, type Fasilitas } from '@/lib/fasilitas/fasilitas';
 import { usePeminjaman } from '@/lib/pemrosesan/peminjaman';
 import { usePengembalian } from '@/lib/pemrosesan/pengembalian';
 import { usePenyewaan } from '@/lib/pemrosesan/penyewaan';
@@ -245,10 +245,9 @@ function EditPengembalianForm() {
       if (existingIndex >= 0) {
         // Remove facility if already selected
         return prev.filter((f) => f.id !== facility.id);
-      } 
-        // Add facility with default condition
-        return [...prev, { id: facility.id, kondisiAset: 'BAIK' }];
-      
+      }
+      // Add facility with default condition
+      return [...prev, { id: facility.id, kondisiAset: 'BAIK' }];
     });
   };
 
@@ -278,9 +277,8 @@ function EditPengembalianForm() {
       return pengajuan.namaPeminjam?.namaLengkap;
     } else if (selectedAssetType === 'penyewaan') {
       return pengajuan.namaPenyewa?.namaLengkap;
-    } 
-      return 'Unknown';
-    
+    }
+    return 'Unknown';
   };
 
   const getShiftName = (pengembalian: AssetDetails) => {
@@ -424,7 +422,9 @@ function EditPengembalianForm() {
                       control={
                         <Checkbox
                           checked={isSelected} // Gunakan isSelected untuk menentukan status checkbox
-                          onChange={() => { handleFacilityChange(facility); }}
+                          onChange={() => {
+                            handleFacilityChange(facility);
+                          }}
                           color="primary"
                         />
                       }
@@ -440,22 +440,24 @@ function EditPengembalianForm() {
                       }
                     />
 
-                    {isSelected ? <Box sx={{ mt: 2, ml: 4 }}>
+                    {isSelected ? (
+                      <Box sx={{ mt: 2, ml: 4 }}>
                         <TextField
                           select
                           size="small"
                           label="Kondisi Fasilitas"
                           value={selectedFacility?.kondisiAset || 'BAIK'} // Gunakan kondisi yang sudah dipilih sebelumnya
-                          onChange={(e) =>
-                            { handleConditionChange(facility.id, e.target.value as 'BAIK' | 'RUSAK' | 'HILANG'); }
-                          }
+                          onChange={(e) => {
+                            handleConditionChange(facility.id, e.target.value as 'BAIK' | 'RUSAK' | 'HILANG');
+                          }}
                           sx={{ minWidth: 200 }}
                         >
                           <MenuItem value="BAIK">Baik</MenuItem>
                           <MenuItem value="RUSAK">Rusak</MenuItem>
                           <MenuItem value="HILANG">Hilang</MenuItem>
                         </TextField>
-                      </Box> : null}
+                      </Box>
+                    ) : null}
                   </Paper>
                 );
               })}
@@ -546,7 +548,9 @@ function EditPengembalianForm() {
                 <TableCell padding="checkbox">
                   <Radio
                     checked={selectedAssets.some((selected) => selected.id === asset.id)}
-                    onChange={() => { handleAssetSelection(asset); }}
+                    onChange={() => {
+                      handleAssetSelection(asset);
+                    }}
                     disabled={
                       (pengembalian?.peminjamanId && pengembalian.peminjamanId !== asset.id) ||
                       (pengembalian?.penyewaanId && pengembalian.penyewaanId !== asset.id) ||
@@ -743,7 +747,9 @@ function EditPengembalianForm() {
                     multiline
                     rows={4}
                     value={tujuan}
-                    onChange={(e) => { setTujuan(e.target.value); }}
+                    onChange={(e) => {
+                      setTujuan(e.target.value);
+                    }}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         backgroundColor: '#ffffff',
@@ -795,7 +801,9 @@ function EditPengembalianForm() {
                     label="Kondisi Aset"
                     select
                     value={kondisiAset}
-                    onChange={(e) => { setKondisiAset(e.target.value); }}
+                    onChange={(e) => {
+                      setKondisiAset(e.target.value);
+                    }}
                   >
                     <MenuItem value="BAIK">BAIK</MenuItem>
                     <MenuItem value="RUSAK">RUSAK</MenuItem>
@@ -810,7 +818,9 @@ function EditPengembalianForm() {
                       multiline
                       rows={4}
                       value={deskripsiKerusakan}
-                      onChange={(e) => { setDeskripsiKerusakan(e.target.value); }}
+                      onChange={(e) => {
+                        setDeskripsiKerusakan(e.target.value);
+                      }}
                       error={!deskripsiKerusakan?.trim()}
                       helperText="Wajib diisi jika kondisi aset rusak atau hilang"
                     />
@@ -895,10 +905,6 @@ function EditPengembalianForm() {
               sx={{
                 flex: { xs: '1', sm: '1 1 auto' },
                 minWidth: { xs: '100%', sm: '180px' },
-                bgcolor: '#9a221a',
-                '&:hover': {
-                  bgcolor: '#f04438',
-                },
               }}
             >
               {isSubmitting ? 'Memproses...' : 'Ajukan Pengembalian'}
@@ -912,10 +918,6 @@ function EditPengembalianForm() {
               sx={{
                 flex: { xs: '1', sm: '1 1 auto' },
                 minWidth: { xs: '100%', sm: '120px' },
-                bgcolor: '#9a221a',
-                '&:hover': {
-                  bgcolor: '#f04438',
-                },
               }}
             >
               Next
@@ -926,17 +928,27 @@ function EditPengembalianForm() {
         <Snackbar
           open={openSnackbar}
           autoHideDuration={6000}
-          onClose={() => { setOpenSnackbar(false); }}
+          onClose={() => {
+            setOpenSnackbar(false);
+          }}
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
-          <Alert onClose={() => { setOpenSnackbar(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          <Alert
+            onClose={() => {
+              setOpenSnackbar(false);
+            }}
+            severity={snackbarSeverity}
+            sx={{ width: '100%' }}
+          >
             {snackbarSeverity === 'success' ? successMessage : errorMessage}
           </Alert>
         </Snackbar>
 
-        {postError ? <Alert severity="error" sx={{ mt: 2 }}>
+        {postError ? (
+          <Alert severity="error" sx={{ mt: 2 }}>
             Error: {postError}
-          </Alert> : null}
+          </Alert>
+        ) : null}
       </Box>
     </LocalizationProvider>
   );

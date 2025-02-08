@@ -14,7 +14,6 @@ import api from '@/lib/api';
 import { usePengembalian } from '@/lib/pemrosesan/pengembalian';
 import { usePengembalianFilter } from '@/contexts/PengembalianContext';
 import { useUsers } from '@/hooks/use-user';
-import Header from '@/components/core/header';
 
 function TableHeader() {
   const {
@@ -40,7 +39,36 @@ function TableHeader() {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSearchQuery(value); // Akan menggunakan handler yang sudah dimodifikasi dari context
+    setSearchQuery(value);
+  };
+
+  const handleTypeFilterChange = (e: any) => {
+    const value = e.target.value;
+    setTypeFilter(value);
+
+    if (e.target.value === 'All') {
+      setStatusPengembalianFilter('All');
+      setStatusAsetFilter('All');
+    }
+  };
+
+  const handleStatusPengembalianFilterChange = (e: any) => {
+    const value = e.target.value;
+    setStatusPengembalianFilter(value);
+
+    if (e.target.value === 'All') {
+      setStatusAsetFilter('All');
+      setTypeFilter('All');
+    }
+  };
+
+  const handleStatusAsetFilterChange = (e: any) => {
+    const value = e.target.value;
+    setStatusAsetFilter(value);
+    if (e.target.value === 'All') {
+      setTypeFilter('All');
+      setStatusPengembalianFilter('All');
+    }
   };
 
   const restrictedRoles = ['DEKAN', 'KADEP', 'WD2'];
@@ -103,23 +131,24 @@ function TableHeader() {
                 width: { xs: '100%', sm: 'auto' },
               }}
             >
-              {user?.role && !restrictedRoles.includes(user.role) ? <Link href="/pengembalian/pengembalian-create" style={{ width: '100%' }}>
+              {user?.role && !restrictedRoles.includes(user.role) ? (
+                <Link href="/pengembalian/pengembalian-create" style={{ width: '100%' }}>
                   <Button
                     id="pengembalian"
                     variant="contained"
                     fullWidth
                     aria-label="pengembalian"
                     sx={{
-                      bgcolor: '#9a221a',
-                      '&:hover': { bgcolor: '#f04438' },
                       padding: '12px 16px',
                       minWidth: '120px',
                     }}
                   >
                     Pengembalian
                   </Button>
-                </Link> : null}
-              {user?.role && !restrictedRoles2.includes(user.role) ? <Button
+                </Link>
+              ) : null}
+              {user?.role && !restrictedRoles2.includes(user.role) ? (
+                <Button
                   id="export"
                   variant="outlined"
                   fullWidth
@@ -137,7 +166,8 @@ function TableHeader() {
                   }}
                 >
                   Export
-                </Button> : null}
+                </Button>
+              ) : null}
             </Stack>
           </Box>
         </Box>
@@ -157,7 +187,7 @@ function TableHeader() {
                 labelId="tipe-filter-label"
                 value={typeFilter}
                 label="Tipe"
-                onChange={(e) => { setTypeFilter(e.target.value as 'All' | 'Peminjaman' | 'Penyewaan'); }}
+                onChange={handleTypeFilterChange}
                 size="small"
               >
                 <MenuItem key="all" value="All">
@@ -178,7 +208,7 @@ function TableHeader() {
                 labelId="status-pengembalian-filter-label"
                 value={statusPengembalianFilter}
                 label="Status Pengembalian"
-                onChange={(e) => { setStatusPengembalianFilter(e.target.value); }}
+                onChange={handleStatusPengembalianFilterChange}
                 size="small"
               >
                 {getUniqueStatusValues('statusPengembalian').map((status) => (
@@ -195,7 +225,7 @@ function TableHeader() {
                 labelId="status-aset-filter-label"
                 value={statusAsetFilter}
                 label="Status Aset"
-                onChange={(e) => { setStatusAsetFilter(e.target.value); }}
+                onChange={handleStatusAsetFilterChange}
                 size="small"
               >
                 {getUniqueStatusValues('statusAset').map((status) => (
@@ -214,9 +244,9 @@ function TableHeader() {
               onChange={handleSearchChange}
               size="small"
               sx={{
-                width: { xs: '100%', md: 200 },
+                width: { xs: '100%', md: 150 },
               }}
-              placeholder="Cari berdasarkan nama peminjam..."
+              placeholder="Cari..."
             />
           </Box>
         </Box>
@@ -224,10 +254,18 @@ function TableHeader() {
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
-        onClose={() => { setSnackbarOpen(false); }}
+        onClose={() => {
+          setSnackbarOpen(false);
+        }}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={() => { setSnackbarOpen(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={() => {
+            setSnackbarOpen(false);
+          }}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>

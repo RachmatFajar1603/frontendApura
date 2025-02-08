@@ -63,21 +63,10 @@ interface Values {
 }
 
 export default function PengembalianTable() {
-  const {
-    pengembalian,
-    totalData,
-    currentPage,
-    getPengembalian,
-    deletePengembalian,
-    updatePengembalianStatus,
-  } = usePengembalian();
+  const { pengembalian, totalData, currentPage, getPengembalian, deletePengembalian, updatePengembalianStatus } =
+    usePengembalian();
 
-  const {
-    statusPengembalianFilter,
-    statusAsetFilter,
-    searchQuery,
-    typeFilter,
-  } = usePengembalianFilter();
+  const { statusPengembalianFilter, statusAsetFilter, searchQuery, typeFilter, setFilteredPengembalian } = usePengembalianFilter();
   const { user } = useUsers();
   // const { departemen } = useDepartemen();
   const router = useRouter();
@@ -102,9 +91,8 @@ export default function PengembalianTable() {
       return 'Peminjaman';
     } else if (pengembalian.Penyewaan) {
       return 'Penyewaan';
-    } 
-      return '-';
-    
+    }
+    return '-';
   };
 
   const getName = (pengembalian: Values) => {
@@ -112,9 +100,8 @@ export default function PengembalianTable() {
       return pengembalian.Peminjaman.namaPeminjam.namaLengkap;
     } else if (pengembalian.Penyewaan) {
       return pengembalian.Penyewaan.namaPenyewa.namaLengkap;
-    } 
-      return '-';
-    
+    }
+    return '-';
   };
 
   const getKodeAset = (pengembalian: Values) => {
@@ -170,11 +157,11 @@ export default function PengembalianTable() {
         statusPengembalianFilter === 'All' || item.statusPengembalian === statusPengembalianFilter;
       const matchStatusAset = statusAsetFilter === 'All' || item.statusAset === statusAsetFilter;
 
-      if (!searchQuery.trim()) return true;
+      if (!searchQuery) return matchType && matchStatusPengembalian && matchStatusAset;
 
       const searchTerms = searchQuery
         .toLowerCase()
-        .split(' ')
+        .split(/\s+/)
         .filter((term) => term.length > 0);
 
       // Helper function untuk mengkonversi field ke string
@@ -213,11 +200,16 @@ export default function PengembalianTable() {
         convertToString(item.Penyewaan?.Fasilitas?.nama),
       ].filter(Boolean); // Menghapus string kosong
 
-      const matchSearch = searchTerms.every((term) => searchableFields.some((field) => field.includes(term)));
+      const matchSearch =
+        searchTerms.length === 0 || searchTerms.every((term) => searchableFields.some((field) => field.includes(term)));
 
       return matchType && matchStatusPengembalian && matchStatusAset && matchSearch;
     });
   }, [pengembalian, typeFilter, statusPengembalianFilter, statusAsetFilter, searchQuery]);
+
+  React.useEffect(() => {
+    setFilteredPengembalian(filteredData);
+  }, [filteredData, setFilteredPengembalian]);
 
   const currentData = React.useMemo(() => {
     const startIndex = page * rowsPerPage;
@@ -320,9 +312,8 @@ export default function PengembalianTable() {
       return pengembalian.Peminjaman.jumlahYangDipinjam;
     } else if (pengembalian.Penyewaan) {
       return pengembalian.Penyewaan.jumlahYangDisewa;
-    } 
-      return '-';
-    
+    }
+    return '-';
   };
 
   const getTanggalMulai = (pengembalian: Values) => {
@@ -330,9 +321,8 @@ export default function PengembalianTable() {
       return pengembalian.Peminjaman.tanggalMulai;
     } else if (pengembalian.Penyewaan) {
       return pengembalian.Penyewaan.tanggalMulai;
-    } 
-      return '-';
-    
+    }
+    return '-';
   };
 
   const getTanggalSelesai = (pengembalian: Values) => {
@@ -340,63 +330,38 @@ export default function PengembalianTable() {
       return pengembalian.Peminjaman.tanggalSelesai;
     } else if (pengembalian.Penyewaan) {
       return pengembalian.Penyewaan.tanggalSelesai;
-    } 
-      return '-';
-    
+    }
+    return '-';
   };
 
   const getShift = (pengembalian: Values) => {
     if (pengembalian.Peminjaman) {
       if (pengembalian.Peminjaman.Alat) {
-        return (
-          `${pengembalian.Peminjaman.Alat.shift.namaShift 
-          } ${ 
-          pengembalian.Peminjaman.Alat.shift.jamMulai 
-          } - ${ 
-          pengembalian.Peminjaman.Alat.shift.jamSelesai}`
-        );
+        return `${pengembalian.Peminjaman.Alat.shift.namaShift} ${pengembalian.Peminjaman.Alat.shift.jamMulai} - ${
+          pengembalian.Peminjaman.Alat.shift.jamSelesai
+        }`;
       } else if (pengembalian.Peminjaman.RuanganUmum) {
-        return (
-          `${pengembalian.Peminjaman.RuanganUmum.shift.namaShift 
-          } ${ 
-          pengembalian.Peminjaman.RuanganUmum.shift.jamMulai 
-          } - ${ 
-          pengembalian.Peminjaman.RuanganUmum.shift.jamSelesai}`
-        );
+        return `${pengembalian.Peminjaman.RuanganUmum.shift.namaShift} ${
+          pengembalian.Peminjaman.RuanganUmum.shift.jamMulai
+        } - ${pengembalian.Peminjaman.RuanganUmum.shift.jamSelesai}`;
       } else if (pengembalian.Peminjaman.RuangLab) {
-        return (
-          `${pengembalian.Peminjaman.RuangLab.shift.namaShift 
-          } ${ 
-          pengembalian.Peminjaman.RuangLab.shift.jamMulai 
-          } - ${ 
-          pengembalian.Peminjaman.RuangLab.shift.jamSelesai}`
-        );
+        return `${pengembalian.Peminjaman.RuangLab.shift.namaShift} ${
+          pengembalian.Peminjaman.RuangLab.shift.jamMulai
+        } - ${pengembalian.Peminjaman.RuangLab.shift.jamSelesai}`;
       }
     } else if (pengembalian.Penyewaan) {
       if (pengembalian.Penyewaan.Alat) {
-        return (
-          `${pengembalian.Penyewaan.Alat.shift.namaShift 
-          } ${ 
-          pengembalian.Penyewaan.Alat.shift.jamMulai 
-          } - ${ 
-          pengembalian.Penyewaan.Alat.shift.jamSelesai}`
-        );
+        return `${pengembalian.Penyewaan.Alat.shift.namaShift} ${pengembalian.Penyewaan.Alat.shift.jamMulai} - ${
+          pengembalian.Penyewaan.Alat.shift.jamSelesai
+        }`;
       } else if (pengembalian.Penyewaan.RuanganUmum) {
-        return (
-          `${pengembalian.Penyewaan.RuanganUmum.shift.namaShift 
-          } ${ 
-          pengembalian.Penyewaan.RuanganUmum.shift.jamMulai 
-          } - ${ 
-          pengembalian.Penyewaan.RuanganUmum.shift.jamSelesai}`
-        );
+        return `${pengembalian.Penyewaan.RuanganUmum.shift.namaShift} ${
+          pengembalian.Penyewaan.RuanganUmum.shift.jamMulai
+        } - ${pengembalian.Penyewaan.RuanganUmum.shift.jamSelesai}`;
       } else if (pengembalian.Penyewaan.RuangLab) {
-        return (
-          `${pengembalian.Penyewaan.RuangLab.shift.namaShift 
-          } ${ 
-          pengembalian.Penyewaan.RuangLab.shift.jamMulai 
-          } - ${ 
-          pengembalian.Penyewaan.RuangLab.shift.jamSelesai}`
-        );
+        return `${pengembalian.Penyewaan.RuangLab.shift.namaShift} ${
+          pengembalian.Penyewaan.RuangLab.shift.jamMulai
+        } - ${pengembalian.Penyewaan.RuangLab.shift.jamSelesai}`;
       }
     }
     return '-';
@@ -407,9 +372,8 @@ export default function PengembalianTable() {
       return pengembalian.jumlahPinjamYangDikembalikan;
     } else if (pengembalian.Penyewaan) {
       return pengembalian.jumlahSewaYangDikembalikan;
-    } 
-      return '-';
-    
+    }
+    return '-';
   };
 
   return (
@@ -633,10 +597,20 @@ export default function PengembalianTable() {
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         {user?.role === 'ADMIN'
           ? [
-              <MenuItem key="edit" onClick={() => { handleEditClick(selectedId!); }}>
+              <MenuItem
+                key="edit"
+                onClick={() => {
+                  handleEditClick(selectedId!);
+                }}
+              >
                 Edit
               </MenuItem>,
-              <MenuItem key="delete" onClick={() => { handleDeleteClick(selectedId!); }}>
+              <MenuItem
+                key="delete"
+                onClick={() => {
+                  handleDeleteClick(selectedId!);
+                }}
+              >
                 Delete
               </MenuItem>,
               <MenuItem
@@ -652,10 +626,20 @@ export default function PengembalianTable() {
             ]
           : user?.role === 'KALAB' && pengembalian.find((p) => p.id === selectedId)?.departemenId === user?.departemenId
             ? [
-                <MenuItem key="edit" onClick={() => { handleEditClick(selectedId!); }}>
+                <MenuItem
+                  key="edit"
+                  onClick={() => {
+                    handleEditClick(selectedId!);
+                  }}
+                >
                   Edit
                 </MenuItem>,
-                <MenuItem key="delete" onClick={() => { handleDeleteClick(selectedId!); }}>
+                <MenuItem
+                  key="delete"
+                  onClick={() => {
+                    handleDeleteClick(selectedId!);
+                  }}
+                >
                   Delete
                 </MenuItem>,
                 <MenuItem
@@ -672,10 +656,20 @@ export default function PengembalianTable() {
             : /* Untuk Pengawas Lab, User, dan Mahasiswa, hanya tampilkan menu jika status belum disetujui/ditolak */
               pengembalian.find((p) => p.id === selectedId)?.statusPengembalian !== 'DISETUJUI' &&
               pengembalian.find((p) => p.id === selectedId)?.statusPengembalian !== 'DITOLAK' && [
-                <MenuItem key="edit" onClick={() => { handleEditClick(selectedId!); }}>
+                <MenuItem
+                  key="edit"
+                  onClick={() => {
+                    handleEditClick(selectedId!);
+                  }}
+                >
                   Edit
                 </MenuItem>,
-                <MenuItem key="delete" onClick={() => { handleDeleteClick(selectedId!); }}>
+                <MenuItem
+                  key="delete"
+                  onClick={() => {
+                    handleDeleteClick(selectedId!);
+                  }}
+                >
                   Delete
                 </MenuItem>,
                 /* Tambahkan opsi Update Status untuk Pengawas Lab */
@@ -707,7 +701,7 @@ export default function PengembalianTable() {
       >
         <DialogTitle>Update Status Pengajuan</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             <FormControl fullWidth>
               <InputLabel id="status-label">Status</InputLabel>
               <Select
@@ -733,7 +727,9 @@ export default function PengembalianTable() {
                 label="Alasan Penolakan"
                 variant="outlined"
                 value={rejectionReason}
-                onChange={(e) => { setRejectionReason(e.target.value); }}
+                onChange={(e) => {
+                  setRejectionReason(e.target.value);
+                }}
                 error={!rejectionReason.trim()}
                 helperText={!rejectionReason.trim() ? 'Alasan penolakan harus diisi' : ''}
                 placeholder="Masukkan alasan penolakan secara detail"
@@ -766,11 +762,17 @@ export default function PengembalianTable() {
         <DialogTitle>Konfirmasi Penghapusan</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Apakah anda yakin ingin menghapus peminjaman ini? Tindakan ini tidak dapat dibatalkan.
+            Apakah anda yakin ingin menghapus pengembalian ini? Tindakan ini tidak dapat dibatalkan.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => { setConfirmDeleteOpen(false); }} color="primary" disabled={isDeleting}>
+          <Button
+            onClick={() => {
+              setConfirmDeleteOpen(false);
+            }}
+            color="primary"
+            disabled={isDeleting}
+          >
             Batal
           </Button>
           <Button onClick={confirmDelete} color="error" disabled={isDeleting}>
@@ -782,10 +784,18 @@ export default function PengembalianTable() {
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
-        onClose={() => { setSnackbarOpen(false); }}
+        onClose={() => {
+          setSnackbarOpen(false);
+        }}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={() => { setSnackbarOpen(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={() => {
+            setSnackbarOpen(false);
+          }}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>

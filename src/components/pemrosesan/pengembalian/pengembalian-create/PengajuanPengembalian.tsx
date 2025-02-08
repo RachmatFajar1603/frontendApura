@@ -41,7 +41,7 @@ import { SkipForward } from '@phosphor-icons/react/dist/ssr/SkipForward';
 import dayjs, { type Dayjs } from 'dayjs';
 
 import { useDepartemen } from '@/lib/departemen/departemen';
-import { type Fasilitas, useFasilitas } from '@/lib/fasilitas/fasilitas';
+import { useFasilitas, type Fasilitas } from '@/lib/fasilitas/fasilitas';
 import { usePeminjaman } from '@/lib/pemrosesan/peminjaman';
 import { usePengembalian } from '@/lib/pemrosesan/pengembalian';
 import { usePenyewaan } from '@/lib/pemrosesan/penyewaan';
@@ -170,10 +170,9 @@ function PengembalianForm() {
       if (existingIndex >= 0) {
         // Remove facility if already selected
         return prev.filter((f) => f.id !== facility.id);
-      } 
-        // Add facility with default condition
-        return [...prev, { id: facility.id, kondisiAset: 'BAIK' }];
-      
+      }
+      // Add facility with default condition
+      return [...prev, { id: facility.id, kondisiAset: 'BAIK' }];
     });
   };
 
@@ -211,9 +210,8 @@ function PengembalianForm() {
       return pengajuan.namaPeminjam?.namaLengkap;
     } else if (selectedAssetType === 'penyewaan') {
       return pengajuan.namaPenyewa?.namaLengkap;
-    } 
-      return 'Unknown';
-    
+    }
+    return 'Unknown';
   };
 
   const getShiftName = (pengembalian: AssetDetails) => {
@@ -382,7 +380,9 @@ function PengembalianForm() {
                     control={
                       <Checkbox
                         checked={selectedFacilities.some((f) => f.id === facility.id)}
-                        onChange={() => { handleFacilityChange(facility); }}
+                        onChange={() => {
+                          handleFacilityChange(facility);
+                        }}
                         color="primary"
                       />
                     }
@@ -405,9 +405,9 @@ function PengembalianForm() {
                         size="small"
                         label="Kondisi Fasilitas"
                         value={selectedFacilities.find((f) => f.id === facility.id)?.kondisiAset || 'BAIK'}
-                        onChange={(e) =>
-                          { handleConditionChange(facility.id, e.target.value as 'BAIK' | 'RUSAK' | 'HILANG'); }
-                        }
+                        onChange={(e) => {
+                          handleConditionChange(facility.id, e.target.value as 'BAIK' | 'RUSAK' | 'HILANG');
+                        }}
                         sx={{ minWidth: 200 }}
                       >
                         <MenuItem value="BAIK">BAIK</MenuItem>
@@ -509,7 +509,9 @@ function PengembalianForm() {
                 <TableCell padding="checkbox">
                   <Radio
                     checked={selectedAssets.some((selected) => selected.id === asset.id)}
-                    onChange={() => { handleAssetSelection(asset); }}
+                    onChange={() => {
+                      handleAssetSelection(asset);
+                    }}
                     disabled={asset.statusAset !== 'SEDANG_DIPINJAM' && asset.statusAset !== 'SEDANG_DISEWA'}
                   />
                 </TableCell>
@@ -523,13 +525,17 @@ function PengembalianForm() {
                       padding: '4px 12px',
                       borderRadius: '16px',
                       color:
-                        asset.statusAset === 'SEDANG_DIPINJAM' || asset.statusAset === 'SEDANG_DISEWA' || asset.statusAset === 'DIKEMBALIKAN'
+                        asset.statusAset === 'SEDANG_DIPINJAM' ||
+                        asset.statusAset === 'SEDANG_DISEWA' ||
+                        asset.statusAset === 'DIKEMBALIKAN'
                           ? '#388e3c'
                           : asset.statusAset === 'PEMINJAMAN_GAGAL' || asset.statusAset === 'PENYEWAAN_GAGAL'
                             ? '#d32f2f'
                             : '#ff9800',
                       backgroundColor:
-                        asset.statusAset === 'SEDANG_DIPINJAM' || asset.statusAset === 'SEDANG_DISEWA'|| asset.statusAset === 'DIKEMBALIKAN'
+                        asset.statusAset === 'SEDANG_DIPINJAM' ||
+                        asset.statusAset === 'SEDANG_DISEWA' ||
+                        asset.statusAset === 'DIKEMBALIKAN'
                           ? '#e8f5e9'
                           : asset.statusAset === 'PEMINJAMAN_GAGAL' || asset.statusAset === 'PENYEWAAN_GAGAL'
                             ? '#ffebee'
@@ -692,7 +698,9 @@ function PengembalianForm() {
                     multiline
                     rows={4}
                     value={tujuan}
-                    onChange={(e) => { setTujuan(e.target.value); }}
+                    onChange={(e) => {
+                      setTujuan(e.target.value);
+                    }}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         backgroundColor: '#ffffff',
@@ -744,7 +752,9 @@ function PengembalianForm() {
                     label="Kondisi Aset"
                     select
                     value={kondisiAset || ''}
-                    onChange={(e) => { setKondisiAset(e.target.value); }}
+                    onChange={(e) => {
+                      setKondisiAset(e.target.value);
+                    }}
                   >
                     <MenuItem value="BAIK">BAIK</MenuItem>
                     <MenuItem value="RUSAK">RUSAK</MenuItem>
@@ -759,7 +769,9 @@ function PengembalianForm() {
                       multiline
                       rows={4}
                       value={deskripsiKerusakan || ''}
-                      onChange={(e) => { setDeskripsiKerusakan(e.target.value); }}
+                      onChange={(e) => {
+                        setDeskripsiKerusakan(e.target.value);
+                      }}
                       error={!deskripsiKerusakan?.trim()}
                       helperText="Wajib diisi jika kondisi aset rusak atau hilang"
                     />
@@ -844,10 +856,6 @@ function PengembalianForm() {
               sx={{
                 flex: { xs: '1', sm: '1 1 auto' },
                 minWidth: { xs: '100%', sm: '180px' },
-                bgcolor: '#9a221a',
-                '&:hover': {
-                  bgcolor: '#f04438',
-                },
               }}
             >
               {isSubmitting ? 'Memproses...' : 'Ajukan Pengembalian'}
@@ -861,10 +869,6 @@ function PengembalianForm() {
               sx={{
                 flex: { xs: '1', sm: '1 1 auto' },
                 minWidth: { xs: '100%', sm: '120px' },
-                bgcolor: '#9a221a',
-                '&:hover': {
-                  bgcolor: '#f04438',
-                },
               }}
             >
               Next
@@ -875,17 +879,27 @@ function PengembalianForm() {
         <Snackbar
           open={openSnackbar}
           autoHideDuration={6000}
-          onClose={() => { setOpenSnackbar(false); }}
+          onClose={() => {
+            setOpenSnackbar(false);
+          }}
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
-          <Alert onClose={() => { setOpenSnackbar(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          <Alert
+            onClose={() => {
+              setOpenSnackbar(false);
+            }}
+            severity={snackbarSeverity}
+            sx={{ width: '100%' }}
+          >
             {snackbarSeverity === 'success' ? successMessage : errorMessage}
           </Alert>
         </Snackbar>
 
-        {postError ? <Alert severity="error" sx={{ mt: 2 }}>
+        {postError ? (
+          <Alert severity="error" sx={{ mt: 2 }}>
             Error: {postError}
-          </Alert> : null}
+          </Alert>
+        ) : null}
       </Box>
     </LocalizationProvider>
   );
