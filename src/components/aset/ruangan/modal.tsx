@@ -114,7 +114,9 @@ const Modal: React.FC<AddAssetModalProps> = ({ open, handleClose }) => {
     }
   };
 
-  const handleSnackbarClose = () => { setSnackbar({ ...snackbar, open: false }); };
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   return (
     <>
@@ -339,18 +341,15 @@ const Modal: React.FC<AddAssetModalProps> = ({ open, handleClose }) => {
           <Button onClick={handleClose} variant="outlined" color="error">
             Batal
           </Button>
-          <Button
-            type="submit"
-            variant="contained"
-            onClick={handleSubmit(onSubmit)}
-            sx={{ bgcolor: '#FFCC28', '&:hover': { bgcolor: '#ffc107' } }}
-          >
+          <Button type="submit" variant="contained" onClick={handleSubmit(onSubmit)}>
             Tambah
           </Button>
         </DialogActions>
-        {errors.root ? <Alert severity="error" sx={{ mx: 2, mb: 2 }}>
+        {errors.root ? (
+          <Alert severity="error" sx={{ mx: 2, mb: 2 }}>
             {errors.root.message}
-          </Alert> : null}
+          </Alert>
+        ) : null}
       </Dialog>
 
       <Snackbar

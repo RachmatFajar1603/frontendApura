@@ -119,7 +119,9 @@ export default function EditModal({ open, handleClose, initialData, onSuccess, s
     }
   };
 
-  const handleSnackbarClose = () => { setSnackbar({ ...snackbar, open: false }); };
+  const handleSnackbarClose = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   return (
     <>
@@ -351,19 +353,16 @@ export default function EditModal({ open, handleClose, initialData, onSuccess, s
           <Button onClick={handleClose} variant="outlined" color="error">
             Batal
           </Button>
-          <Button
-            onClick={handleSubmit(onSubmit)}
-            type="submit"
-            variant="contained"
-            sx={{ bgcolor: '#FFCC28', '&:hover': { bgcolor: '#ffc107' } }}
-          >
+          <Button onClick={handleSubmit(onSubmit)} type="submit" variant="contained">
             Simpan
           </Button>
         </DialogActions>
         {/* Error handling */}
-        {errors.root ? <Alert severity="error" sx={{ mx: 2, mb: 2 }}>
+        {errors.root ? (
+          <Alert severity="error" sx={{ mx: 2, mb: 2 }}>
             {errors.root.message}
-          </Alert> : null}
+          </Alert>
+        ) : null}
       </Dialog>
 
       <Snackbar

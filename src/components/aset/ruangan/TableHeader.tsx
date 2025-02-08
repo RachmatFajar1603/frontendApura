@@ -9,8 +9,8 @@ import TextField from '@mui/material/TextField';
 import { Download as DownloadIcon } from '@phosphor-icons/react/dist/ssr/Download';
 
 import api from '@/lib/api';
-import { useRuanganLab } from '@/lib/aset/RuanganLab/useRuanganLab';
-import { useRuanganUmum } from '@/lib/aset/RuanganUmum/useRuanganUmum';
+import { useRuanganLabManage } from '@/lib/aset/RuanganLab/UseRuanganLabManage';
+import { useRuanganUmumManage } from '@/lib/aset/RuanganUmum/UseRuanganUmumManage';
 import { useDepartemen } from '@/lib/departemen/departemen';
 import { useGedung } from '@/lib/gedung/gedung';
 import { useRuanganFilter } from '@/contexts/RuanganContext';
@@ -42,12 +42,12 @@ function TableHeader() {
   const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'error'>('success');
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
 
-  const { ruanganLab } = useRuanganLab();
-  const { ruanganUmum } = useRuanganUmum();
+  const { ruanganLabManage } = useRuanganLabManage();
+  const { ruanganUmumManage } = useRuanganUmumManage();
 
   const getUniqueStatusValues = () => {
-    const labStatus = Array.from(new Set(ruanganLab.map((item: any) => item.statusAset)));
-    const umumStatus = Array.from(new Set(ruanganUmum.map((item: any) => item.statusAset)));
+    const labStatus = Array.from(new Set(ruanganLabManage.map((item: any) => item.statusAset)));
+    const umumStatus = Array.from(new Set(ruanganUmumManage.map((item: any) => item.statusAset)));
     const allStatus = Array.from(new Set([...labStatus, ...umumStatus]));
     return ['All', ...allStatus];
   };
@@ -56,7 +56,24 @@ function TableHeader() {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSearchQuery(value); // Akan menggunakan handler yang sudah dimodifikasi dari context
+    setSearchQuery(value);
+  };
+
+  const handleDepartemenChange = (e: any) => {
+    setDepartemenFilter(e.target.value);
+    // Reset related filters when department changes
+    if (e.target.value === 'All') {
+      setGedungFilter('All');
+      setLantaiFilter('All');
+    }
+  };
+
+  const handleGedungChange = (e: any) => {
+    setGedungFilter(e.target.value);
+    // Reset lantai when gedung changes
+    if (e.target.value === 'All') {
+      setLantaiFilter('All');
+    }
   };
 
   const handleExport = async () => {
@@ -120,21 +137,21 @@ function TableHeader() {
                 width: { xs: '100%', sm: 'auto' },
               }}
             >
-              {user?.role && !restrictedRoles.includes(user.role) ? <Button
+              {user?.role && !restrictedRoles.includes(user.role) ? (
+                <Button
                   id="tambah"
                   variant="contained"
                   fullWidth
                   aria-label="tambah"
                   sx={{
-                    bgcolor: '#9a221a',
-                    '&:hover': { bgcolor: '#f04438' },
                     padding: '12px 16px',
                     minWidth: '120px',
                   }}
                   onClick={handleOpen}
                 >
                   Tambah
-                </Button> : null}
+                </Button>
+              ) : null}
               <Button
                 id="export"
                 variant="outlined"
@@ -175,7 +192,9 @@ function TableHeader() {
                 labelId="tipe-ruangan-filter-label"
                 value={selectedAsset}
                 label="Tipe Ruangan"
-                onChange={(e) => { setSelectedAsset(e.target.value); }}
+                onChange={(e) => {
+                  setSelectedAsset(e.target.value);
+                }}
                 size="small"
               >
                 <MenuItem value="ruangan_umum">Ruangan Umum</MenuItem>
@@ -189,7 +208,7 @@ function TableHeader() {
                 labelId="departemen-filter-label"
                 value={departemenFilter}
                 label="Departemen"
-                onChange={(e) => { setDepartemenFilter(e.target.value); }}
+                onChange={handleDepartemenChange}
                 size="small"
               >
                 <MenuItem value="All">All</MenuItem>
@@ -207,7 +226,7 @@ function TableHeader() {
                 labelId="gedung-filter-label"
                 value={gedungFilter}
                 label="Gedung"
-                onChange={(e) => { setGedungFilter(e.target.value); }}
+                onChange={handleGedungChange}
                 size="small"
               >
                 <MenuItem value="All">All</MenuItem>
@@ -225,7 +244,9 @@ function TableHeader() {
                 labelId="lantai-filter-label"
                 value={lantaiFilter}
                 label="Lantai"
-                onChange={(e) => { setLantaiFilter(e.target.value); }}
+                onChange={(e) => {
+                  setLantaiFilter(e.target.value);
+                }}
                 size="small"
               >
                 <MenuItem value="All">All</MenuItem>
@@ -241,11 +262,13 @@ function TableHeader() {
                 labelId="status-filter-label"
                 value={statusFilter}
                 label="Status"
-                onChange={(e) => { setStatusFilter(e.target.value); }}
+                onChange={(e) => {
+                  setStatusFilter(e.target.value);
+                }}
                 size="small"
               >
-                {getUniqueStatusValues().map((status, index) => (
-                  <MenuItem key={`status-${status}-${index}`} value={status}>
+                {getUniqueStatusValues().map((status) => (
+                  <MenuItem key={status} value={status}>
                     {status}
                   </MenuItem>
                 ))}
@@ -271,10 +294,18 @@ function TableHeader() {
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
-        onClose={() => { setSnackbarOpen(false); }}
+        onClose={() => {
+          setSnackbarOpen(false);
+        }}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={() => { setSnackbarOpen(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={() => {
+            setSnackbarOpen(false);
+          }}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>

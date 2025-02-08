@@ -1,6 +1,6 @@
 'use client';
 
-import React, { type MouseEvent, useState } from 'react';
+import React, { useState, type MouseEvent } from 'react';
 import {
   Box,
   Button,
@@ -30,8 +30,6 @@ import { useRuanganLab } from '@/lib/aset/RuanganLab/useRuanganLab';
 import { useRuanganLabManage } from '@/lib/aset/RuanganLab/UseRuanganLabManage';
 import { useRuanganUmum } from '@/lib/aset/RuanganUmum/useRuanganUmum';
 import { useRuanganUmumManage } from '@/lib/aset/RuanganUmum/UseRuanganUmumManage';
-import { useDepartemen } from '@/lib/departemen/departemen';
-import { useGedung } from '@/lib/gedung/gedung';
 import { useRuanganFilter } from '@/contexts/RuanganContext';
 import { useUsers } from '@/hooks/use-user';
 
@@ -42,9 +40,7 @@ export default function AsetRuanganTable() {
   const { deleteRuanganUmum } = useRuanganUmum();
   const { ruanganLabManage, loadingRuanganLabManage, getRuanganLabManage } = useRuanganLabManage();
   const { ruanganUmumManage, loadingRuanganUmumManage, getRuanganUmumManage } = useRuanganUmumManage();
-  const { gedung } = useGedung();
-  const { departemen } = useDepartemen();
-  const { selectedAsset, departemenFilter, gedungFilter, lantaiFilter, statusFilter, searchQuery, setFilteredData } =
+  const { selectedAsset, departemenFilter, gedungFilter, lantaiFilter, statusFilter, searchQuery, setFilteredRuangan } =
     useRuanganFilter();
   const { user } = useUsers();
 
@@ -72,27 +68,27 @@ export default function AsetRuanganTable() {
       const matchLantai = lantaiFilter === 'All' || Number(item.lantai) === Number(lantaiFilter);
       const matchStatus = statusFilter === 'All' || item.statusAset === statusFilter;
 
-      if (!searchQuery.trim()) return true; // Jika search query kosong, tampilkan semua
+      if (!searchQuery) return matchDepartemen && matchGedung && matchLantai && matchStatus;
 
       const searchTerms = searchQuery
         .toLowerCase()
-        .split(' ')
+        .split(/\s+/)
         .filter((term) => term.length > 0);
 
       const searchableFields = [
-        item.nama,
-        item.pengawasLab?.namaLengkap,
-        item.kode,
-        item.gedungId,
-        item.harga?.toString(),
-        item.statusAset,
-        item.jumlah?.toString(),
-        item.shift?.namaShift,
-        departemen.find((d) => d.id === item.departemenId)?.nama,
-        gedung.find((g) => g.id === item.gedungId)?.nama,
-      ].map((field) => field?.toLowerCase() || '');
+        item.nama?.toLowerCase() || '',
+        item.pengawasLab?.namaLengkap?.toLowerCase() || '',
+        item.kode?.toLowerCase() || '',
+        item.statusAset?.toLowerCase() || '',
+        item.departemen?.nama?.toLowerCase() || '',
+        item.gedung?.nama?.toLowerCase() || '',
+        item.shift?.namaShift?.toLowerCase() || '',
+        item.harga?.toString() || '',
+        item.jumlah?.toString() || '',
+      ];
 
-      const matchSearch = searchTerms.every((term) => searchableFields.some((field) => field.includes(term)));
+      const matchSearch =
+        searchTerms.length === 0 || searchTerms.every((term) => searchableFields.some((field) => field.includes(term)));
 
       return matchDepartemen && matchGedung && matchLantai && matchStatus && matchSearch;
     });
@@ -106,6 +102,10 @@ export default function AsetRuanganTable() {
     statusFilter,
     searchQuery,
   ]);
+
+  React.useEffect(() => {
+    setFilteredRuangan(filteredData);
+  }, [filteredData, setFilteredRuangan]);
 
   const currentData = React.useMemo(() => {
     const startIndex = page * rowsPerPage;
@@ -183,6 +183,7 @@ export default function AsetRuanganTable() {
     setPage(newPage);
   };
 
+  // Handle rows per page change
   const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
@@ -232,17 +233,14 @@ export default function AsetRuanganTable() {
     }
 
     return currentData.map((row, index) => {
-      const departemenName = departemen.find((d) => d.id === row.departemenId)?.nama || 'Unknown';
-      const gedungName = gedung.find((g) => g.id === row.gedungId)?.nama || 'Unknown';
-
       return (
         <TableRow key={row.id}>
           <TableCell>{index + 1 + page * rowsPerPage}</TableCell>
           <TableCell>{row.pengawasLab?.namaLengkap || '-'}</TableCell>
           <TableCell>{row.kode}</TableCell>
           <TableCell>{row.nama}</TableCell>
-          <TableCell>{departemenName}</TableCell>
-          <TableCell>{gedungName}</TableCell>
+          <TableCell>{row.departemen?.nama}</TableCell>
+          <TableCell>{row.gedung?.nama}</TableCell>
           <TableCell>{row.lantai}</TableCell>
           <TableCell>{row.harga ? `Rp. ${Number(row.harga).toLocaleString('id-ID')}` : '-'}</TableCell>
           <TableCell>
@@ -278,11 +276,17 @@ export default function AsetRuanganTable() {
               {row.shift?.jamMulai} - {row.shift?.jamSelesai}
             </Typography>
           </TableCell>
-          {user?.role && allowedRoles.includes(user.role) ? <TableCell>
-              <IconButton onClick={(event) => { handleClick(event, row); }}>
+          {user?.role && allowedRoles.includes(user.role) ? (
+            <TableCell>
+              <IconButton
+                onClick={(event) => {
+                  handleClick(event, row);
+                }}
+              >
                 <DotsThreeVertical />
               </IconButton>
-            </TableCell> : null}
+            </TableCell>
+          ) : null}
         </TableRow>
       );
     });
@@ -343,7 +347,7 @@ export default function AsetRuanganTable() {
         <DialogTitle>Konfirmasi Hapus</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Apakah Anda yakin ingin menghapus data ini? Tindakan ini tidak dapat dibatalkan.
+            Apakah Anda yakin ingin menghapus data ruangan ini? Tindakan ini tidak dapat dibatalkan.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -359,17 +363,27 @@ export default function AsetRuanganTable() {
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
-        onClose={() => { setSnackbarOpen(false); }}
+        onClose={() => {
+          setSnackbarOpen(false);
+        }}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={() => { setSnackbarOpen(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={() => {
+            setSnackbarOpen(false);
+          }}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
 
       <EditModal
         open={editModalOpen}
-        handleClose={() => { setEditModalOpen(false); }}
+        handleClose={() => {
+          setEditModalOpen(false);
+        }}
         initialData={selectedRuanganData}
         onSuccess={handleEditSuccess}
         selectedAsset={selectedAsset}
