@@ -32,8 +32,6 @@ import {
   TableRow,
   TextField,
   Typography,
-  useMediaQuery,
-  useTheme,
 } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -52,6 +50,7 @@ import { useFasilitas } from '@/lib/fasilitas/fasilitas';
 import { useGedung } from '@/lib/gedung/gedung';
 import { usePeminjaman } from '@/lib/pemrosesan/peminjaman';
 import { usePenyewaan } from '@/lib/pemrosesan/penyewaan';
+
 // import { useUsers } from '@/hooks/use-user';
 
 interface AssetDetails {
@@ -127,17 +126,10 @@ const EditPeminjamanForm: React.FC = () => {
   const { alat, loading: loadingAlat } = useAlat();
   const { departemen } = useDepartemen();
   const { gedung } = useGedung();
-  const {
-    getPeminjamanById,
-    peminjaman,
-    updatePeminjaman,
-    error: updateError,
-  } = usePeminjaman();
+  const { getPeminjamanById, peminjaman, updatePeminjaman, error: updateError } = usePeminjaman();
   const { penyewaan } = usePenyewaan();
   // const { user } = useUsers();
   const { fasilitas } = useFasilitas();
-
-  const theme = useTheme();
 
   const steps = ['Pilih Jenis Aset', 'Pilih Aset', 'Detail Peminjaman'];
 
@@ -218,27 +210,26 @@ const EditPeminjamanForm: React.FC = () => {
       if (exists) {
         // If unchecking, remove the facility
         return prev.filter((f) => f.id !== facilityId);
-      } 
-        // Check facility status and availability
-        const facility = fasilitas.find((f) => f.id === facilityId);
-        if (
-          facility &&
-          (facility.jumlah <= 0 ||
-            (facility.statusAset !== 'TERSEDIA' &&
-              facility.statusAset !== 'SEDANG_DIPINJAM' &&
-              facility.statusAset !== 'SEDANG_DISEWA'))
-        ) {
-          setErrorMessage('Hanya fasilitas dengan status TERSEDIA yang dapat dipilih.');
-          setSnackbarSeverity('error');
-          setOpenSnackbar(true);
-          return prev;
-        }
+      }
+      // Check facility status and availability
+      const facility = fasilitas.find((f) => f.id === facilityId);
+      if (
+        facility &&
+        (facility.jumlah <= 0 ||
+          (facility.statusAset !== 'TERSEDIA' &&
+            facility.statusAset !== 'SEDANG_DIPINJAM' &&
+            facility.statusAset !== 'SEDANG_DISEWA'))
+      ) {
+        setErrorMessage('Hanya fasilitas dengan status TERSEDIA yang dapat dipilih.');
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
+        return prev;
+      }
 
-        // If checking, add the facility with original quantity if it exists, or previous quantity, or default to 1
-        const quantity = originalQuantities[facilityId] || prev.find((f) => f.id === facilityId)?.jumlahDipinjam || 1;
+      // If checking, add the facility with original quantity if it exists, or previous quantity, or default to 1
+      const quantity = originalQuantities[facilityId] || prev.find((f) => f.id === facilityId)?.jumlahDipinjam || 1;
 
-        return [...prev, { id: facilityId, jumlahDipinjam: quantity }];
-      
+      return [...prev, { id: facilityId, jumlahDipinjam: quantity }];
     });
   };
 
@@ -526,7 +517,9 @@ const EditPeminjamanForm: React.FC = () => {
                   edge="start"
                   disabled={isDisabled}
                   checked={isChecked}
-                  onChange={() => { handleFacilityToggle(roomId, facility.id); }}
+                  onChange={() => {
+                    handleFacilityToggle(roomId, facility.id);
+                  }}
                   tabIndex={-1}
                   disableRipple
                 />
@@ -570,7 +563,9 @@ const EditPeminjamanForm: React.FC = () => {
               <TextField
                 type="number"
                 value={isChecked ? selectedFasilitas.find((f) => f.id === facility.id)?.jumlahDipinjam || 0 : 0}
-                onChange={(e) => { handleFacilityQuantityChange(facility.id, e.target.value); }}
+                onChange={(e) => {
+                  handleFacilityQuantityChange(facility.id, e.target.value);
+                }}
                 InputProps={{
                   inputProps: {
                     min: 1,
@@ -708,7 +703,9 @@ const EditPeminjamanForm: React.FC = () => {
                         <TextField
                           type="number"
                           value={selectedAsset?.quantity || ''}
-                          onChange={(e) => { handleQuantityChange(asset.id, e.target.value); }}
+                          onChange={(e) => {
+                            handleQuantityChange(asset.id, e.target.value);
+                          }}
                           disabled={!selectedAsset || asset.statusAset !== 'TERSEDIA' || asset.jumlah === 0}
                           InputProps={{
                             inputProps: {
@@ -744,7 +741,8 @@ const EditPeminjamanForm: React.FC = () => {
                       </Box>
                     </TableCell>
                   </TableRow>
-                  {selectedAssetType === 'ruanganUmum' && isSelected ? <TableRow>
+                  {selectedAssetType === 'ruanganUmum' && isSelected ? (
+                    <TableRow>
                       <TableCell colSpan={9}>
                         <Collapse in={isSelected}>
                           <Box
@@ -762,7 +760,8 @@ const EditPeminjamanForm: React.FC = () => {
                           </Box>
                         </Collapse>
                       </TableCell>
-                    </TableRow> : null}
+                    </TableRow>
+                  ) : null}
                 </React.Fragment>
               );
             })}
@@ -884,7 +883,9 @@ const EditPeminjamanForm: React.FC = () => {
                     multiline
                     rows={4}
                     value={tujuan}
-                    onChange={(e) => { setTujuan(e.target.value); }}
+                    onChange={(e) => {
+                      setTujuan(e.target.value);
+                    }}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         backgroundColor: '#ffffff',
@@ -899,7 +900,9 @@ const EditPeminjamanForm: React.FC = () => {
                   <DatePicker
                     label="Tanggal Mulai"
                     value={tanggalMulai}
-                    onChange={(newValue) => { handleDateChange(newValue, true); }}
+                    onChange={(newValue) => {
+                      handleDateChange(newValue, true);
+                    }}
                     slotProps={{
                       textField: {
                         fullWidth: true,
@@ -919,7 +922,9 @@ const EditPeminjamanForm: React.FC = () => {
                   <DatePicker
                     label="Tanggal Selesai"
                     value={tanggalSelesai}
-                    onChange={(newValue) => { handleDateChange(newValue, false); }}
+                    onChange={(newValue) => {
+                      handleDateChange(newValue, false);
+                    }}
                     slotProps={{
                       textField: {
                         fullWidth: true,
@@ -997,7 +1002,8 @@ const EditPeminjamanForm: React.FC = () => {
                       <Typography variant="body2" sx={{ color: 'text.primary' }}>
                         {ttdPeminjam ? extractFilename(ttdPeminjam) : 'Belum ada file yang diunggah'}
                       </Typography>
-                      {ttdPeminjam ? <Button
+                      {ttdPeminjam ? (
+                        <Button
                           color="error"
                           size="small"
                           onClick={handleRemoveFile}
@@ -1009,7 +1015,8 @@ const EditPeminjamanForm: React.FC = () => {
                           }}
                         >
                           Hapus
-                        </Button> : null}
+                        </Button>
+                      ) : null}
                     </Box>
                   </Box>
                 </Grid>
@@ -1097,10 +1104,6 @@ const EditPeminjamanForm: React.FC = () => {
               sx={{
                 flex: { xs: '1', sm: '1 1 auto' },
                 minWidth: { xs: '100%', sm: '180px' },
-                bgcolor: '#9a221a',
-                '&:hover': {
-                  bgcolor: '#f04438',
-                },
               }}
             >
               {isSubmitting ? 'Memproses...' : 'Update Peminjaman'}
@@ -1114,10 +1117,6 @@ const EditPeminjamanForm: React.FC = () => {
               sx={{
                 flex: { xs: '1', sm: '1 1 auto' },
                 minWidth: { xs: '100%', sm: '120px' },
-                bgcolor: '#9a221a',
-                '&:hover': {
-                  bgcolor: '#f04438',
-                },
               }}
             >
               Next
@@ -1128,17 +1127,27 @@ const EditPeminjamanForm: React.FC = () => {
         <Snackbar
           open={openSnackbar}
           autoHideDuration={6000}
-          onClose={() => { setOpenSnackbar(false); }}
+          onClose={() => {
+            setOpenSnackbar(false);
+          }}
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
-          <Alert onClose={() => { setOpenSnackbar(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          <Alert
+            onClose={() => {
+              setOpenSnackbar(false);
+            }}
+            severity={snackbarSeverity}
+            sx={{ width: '100%' }}
+          >
             {snackbarSeverity === 'success' ? successMessage : errorMessage}
           </Alert>
         </Snackbar>
 
-        {updateError ? <Alert severity="error" sx={{ mt: 2 }}>
+        {updateError ? (
+          <Alert severity="error" sx={{ mt: 2 }}>
             Error: {updateError}
-          </Alert> : null}
+          </Alert>
+        ) : null}
       </Box>
     </LocalizationProvider>
   );

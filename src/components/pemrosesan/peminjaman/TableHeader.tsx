@@ -49,7 +49,32 @@ const TableHeader: React.FC = () => {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSearchQuery(value); // Akan menggunakan handler yang sudah dimodifikasi dari context
+    setSearchQuery(value);
+  };
+
+  const handleDepartemenChange = (e: any) => {
+    setDepartemenFilter(e.target.value);
+    // Reset related filters when department changes
+    if (e.target.value === 'All') {
+      setStatusPengajuanFilter('All');
+      setStatusAsetFilter('All');
+    }
+  };
+
+  const handleStatusPengajuanChange = (e: any) => {
+    setStatusPengajuanFilter(e.target.value);
+    if (e.target.value === 'All') {
+      setStatusAsetFilter('All');
+      setDepartemenFilter('All');
+    }
+  };
+
+  const handleStatusAsetChange = (e: any) => {
+    setStatusAsetFilter(e.target.value);
+    if (e.target.value === 'All') {
+      setStatusPengajuanFilter('All');
+      setDepartemenFilter('All');
+    }
   };
 
   const restrictedRoles = ['DEKAN', 'KADEP', 'WD2'];
@@ -112,23 +137,24 @@ const TableHeader: React.FC = () => {
                 width: { xs: '100%', sm: 'auto' },
               }}
             >
-              {user?.role && !restrictedRoles.includes(user.role) ? <Link href="/peminjaman/peminjaman-create" style={{ width: '100%' }}>
+              {user?.role && !restrictedRoles.includes(user.role) ? (
+                <Link href="/peminjaman/peminjaman-create" style={{ width: '100%' }}>
                   <Button
                     id="peminjaman"
                     variant="contained"
                     fullWidth
                     aria-label="Peminjaman"
                     sx={{
-                      bgcolor: '#9a221a',
-                      '&:hover': { bgcolor: '#f04438' },
                       padding: '12px 16px',
                       minWidth: '120px',
                     }}
                   >
                     Peminjaman
                   </Button>
-                </Link> : null}
-              {user?.role && !restrictedRoles2.includes(user.role) ? <Button
+                </Link>
+              ) : null}
+              {user?.role && !restrictedRoles2.includes(user.role) ? (
+                <Button
                   id="export"
                   variant="outlined"
                   fullWidth
@@ -146,7 +172,8 @@ const TableHeader: React.FC = () => {
                   }}
                 >
                   Export
-                </Button> : null}
+                </Button>
+              ) : null}
             </Stack>
           </Box>
         </Box>
@@ -161,18 +188,18 @@ const TableHeader: React.FC = () => {
               width: '100%',
             }}
           >
-            <FormControl sx={{ width: { xs: '100%', md: 200 } }}>
+            <FormControl sx={{ width: { xs: '100%', md: 150 } }}>
               <InputLabel id="departemen-filter-label">Departemen</InputLabel>
               <Select
                 labelId="departemen-filter-label"
                 value={departemenFilter}
-                onChange={(e) => { setDepartemenFilter(e.target.value); }}
-                size="small"
                 label="Departemen"
+                onChange={handleDepartemenChange}
+                size="small"
               >
                 <MenuItem value="All">All</MenuItem>
                 {departemen.map((dept) => (
-                  <MenuItem key={dept.id} value={dept.nama}>
+                  <MenuItem key={dept.id} value={dept.id}>
                     {dept.nama}
                   </MenuItem>
                 ))}
@@ -184,7 +211,7 @@ const TableHeader: React.FC = () => {
               <Select
                 labelId="status-pengajuan-filter-label"
                 value={statusPengajuanFilter}
-                onChange={(e) => { setStatusPengajuanFilter(e.target.value); }}
+                onChange={handleStatusPengajuanChange}
                 size="small"
                 label="Status Pengajuan"
               >
@@ -201,7 +228,7 @@ const TableHeader: React.FC = () => {
               <Select
                 labelId="status-aset-filter-label"
                 value={statusAsetFilter}
-                onChange={(e) => { setStatusAsetFilter(e.target.value); }}
+                onChange={handleStatusAsetChange}
                 size="small"
                 label="Status Aset"
               >
@@ -221,9 +248,9 @@ const TableHeader: React.FC = () => {
               onChange={handleSearchChange}
               size="small"
               sx={{
-                width: { xs: '100%', md: 200 },
+                width: { xs: '100%', md: 150 },
               }}
-              placeholder="Cari berdasarkan nama peminjam..."
+              placeholder="Cari..."
             />
           </Box>
         </Box>
@@ -231,10 +258,18 @@ const TableHeader: React.FC = () => {
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
-        onClose={() => { setSnackbarOpen(false); }}
+        onClose={() => {
+          setSnackbarOpen(false);
+        }}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={() => { setSnackbarOpen(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={() => {
+            setSnackbarOpen(false);
+          }}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>

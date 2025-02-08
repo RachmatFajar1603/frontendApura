@@ -72,21 +72,11 @@ interface Values {
 }
 
 export default function PeminjamanTable() {
-  const {
-    peminjaman,
-    totalData,
-    currentPage,
-    getPeminjaman,
-    deletePeminjaman,
-    updatePeminjamanStatus,
-  } = usePeminjaman();
+  const { peminjaman, totalData, currentPage, getPeminjaman, deletePeminjaman, updatePeminjamanStatus } =
+    usePeminjaman();
 
-  const {
-    departemenFilter,
-    statusPengajuanFilter,
-    statusAsetFilter,
-    searchQuery,
-  } = usePeminjamanFilter();
+  const { departemenFilter, statusPengajuanFilter, statusAsetFilter, searchQuery, setFilteredPeminjaman } =
+    usePeminjamanFilter();
 
   const { alat } = useAlat();
   const { ruanganLab } = useRuanganLab();
@@ -118,9 +108,8 @@ export default function PeminjamanTable() {
       return peminjaman.RuangLab?.nama || 'Ruang Lab';
     } else if (peminjaman.alatId) {
       return peminjaman.Alat?.nama || 'Alat';
-    } 
-      return 'Unknown Aset';
-    
+    }
+    return 'Unknown Aset';
   };
 
   const getShiftName = (peminjaman: Values) => {
@@ -155,43 +144,47 @@ export default function PeminjamanTable() {
 
   const filteredData = React.useMemo(() => {
     return peminjaman.filter((item) => {
-      const matchDepartemen = departemenFilter === 'All' || item.Departemen?.nama === departemenFilter;
+      const matchDepartemen = departemenFilter === 'All' || item.departemenId === departemenFilter;
       const matchStatus = statusPengajuanFilter === 'All' || item.statusPengajuan === statusPengajuanFilter;
       const matchAset = statusAsetFilter === 'All' || item.statusAset === statusAsetFilter;
 
       // Perbaikan logika pencarian
-      if (!searchQuery.trim()) return true; // Jika search query kosong, tampilkan semua
+      if (!searchQuery) return matchDepartemen && matchStatus && matchAset;
 
       const searchTerms = searchQuery
         .toLowerCase()
-        .split(' ')
+        .split(/\s+/)
         .filter((term) => term.length > 0);
 
       const searchableFields = [
-        item.tujuan,
-        item.namaPeminjam?.namaLengkap,
-        item.namaPenyetuju?.namaLengkap,
-        item.Departemen?.nama,
-        item.RuanganUmum?.nama,
-        item.RuangLab?.nama,
-        item.Alat?.nama,
-        item.RuanganUmum?.shift?.namaShift,
-        item.RuangLab?.shift?.namaShift,
-        item.Alat?.shift?.namaShift,
-        item.RuanganUmum?.shift?.jamMulai,
-        item.RuangLab?.shift?.jamMulai,
-        item.Alat?.shift?.jamMulai,
-        item.RuanganUmum?.shift?.jamSelesai,
-        item.RuangLab?.shift?.jamSelesai,
-        item.Alat?.shift?.jamSelesai,
-      ].map((field) => field?.toLowerCase() || '');
+        item.tujuan?.toLowerCase() || '',
+        item.namaPeminjam?.namaLengkap || '',
+        item.namaPenyetuju?.namaLengkap || '',
+        item.Departemen?.nama || '',
+        item.RuanganUmum?.nama || '',
+        item.RuangLab?.nama || '',
+        item.Alat?.nama || '',
+        item.RuanganUmum?.shift?.namaShift || '',
+        item.RuangLab?.shift?.namaShift || '',
+        item.Alat?.shift?.namaShift || '',
+        item.RuanganUmum?.shift?.jamMulai || '',
+        item.RuangLab?.shift?.jamMulai || '',
+        item.Alat?.shift?.jamMulai || '',
+        item.RuanganUmum?.shift?.jamSelesai || '',
+        item.RuangLab?.shift?.jamSelesai || '',
+        item.Alat?.shift?.jamSelesai || '',
+      ];
 
-      // Mencari apakah setiap term ada dalam salah satu field
-      const matchSearch = searchTerms.every((term) => searchableFields.some((field) => field.includes(term)));
+      const matchSearch =
+        searchTerms.length === 0 || searchTerms.every((term) => searchableFields.some((field) => field.includes(term)));
 
       return matchDepartemen && matchStatus && matchAset && matchSearch;
     });
   }, [peminjaman, departemenFilter, statusPengajuanFilter, statusAsetFilter, searchQuery]);
+
+  React.useEffect(() => {
+    setFilteredPeminjaman(filteredData);
+  }, [filteredData, setFilteredPeminjaman]);
 
   const currentData = React.useMemo(() => {
     const startIndex = page * rowsPerPage;
@@ -472,9 +465,11 @@ export default function PeminjamanTable() {
                   )}
                 </TableCell>
                 <TableCell>
-                  {peminjaman.id ? <IconButton onClick={() => handlePdfDownload(peminjaman.id)}>
+                  {peminjaman.id ? (
+                    <IconButton onClick={() => handlePdfDownload(peminjaman.id)}>
                       <DownloadSimple />
-                    </IconButton> : null}
+                    </IconButton>
+                  ) : null}
                 </TableCell>
                 {(user?.role === 'USER' || user?.role === 'MAHASISWA' || allowedRoles.includes(user?.role || '')) && (
                   <TableCell>
@@ -524,10 +519,20 @@ export default function PeminjamanTable() {
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         {user?.role === 'ADMIN'
           ? [
-              <MenuItem key="edit" onClick={() => { handleEditClick(selectedId!); }}>
+              <MenuItem
+                key="edit"
+                onClick={() => {
+                  handleEditClick(selectedId!);
+                }}
+              >
                 Edit
               </MenuItem>,
-              <MenuItem key="delete" onClick={() => { handleDeleteClick(selectedId!); }}>
+              <MenuItem
+                key="delete"
+                onClick={() => {
+                  handleDeleteClick(selectedId!);
+                }}
+              >
                 Delete
               </MenuItem>,
               <MenuItem
@@ -543,10 +548,20 @@ export default function PeminjamanTable() {
             ]
           : user?.role === 'KALAB' && peminjaman.find((p) => p.id === selectedId)?.Departemen?.id === user?.departemenId
             ? [
-                <MenuItem key="edit" onClick={() => { handleEditClick(selectedId!); }}>
+                <MenuItem
+                  key="edit"
+                  onClick={() => {
+                    handleEditClick(selectedId!);
+                  }}
+                >
                   Edit
                 </MenuItem>,
-                <MenuItem key="delete" onClick={() => { handleDeleteClick(selectedId!); }}>
+                <MenuItem
+                  key="delete"
+                  onClick={() => {
+                    handleDeleteClick(selectedId!);
+                  }}
+                >
                   Delete
                 </MenuItem>,
                 <MenuItem
@@ -563,10 +578,20 @@ export default function PeminjamanTable() {
             : /* Untuk Pengawas Lab, User, dan Mahasiswa, hanya tampilkan menu jika status belum disetujui/ditolak */
               peminjaman.find((p) => p.id === selectedId)?.statusPengajuan !== 'DISETUJUI' &&
               peminjaman.find((p) => p.id === selectedId)?.statusPengajuan !== 'DITOLAK' && [
-                <MenuItem key="edit" onClick={() => { handleEditClick(selectedId!); }}>
+                <MenuItem
+                  key="edit"
+                  onClick={() => {
+                    handleEditClick(selectedId!);
+                  }}
+                >
                   Edit
                 </MenuItem>,
-                <MenuItem key="delete" onClick={() => { handleDeleteClick(selectedId!); }}>
+                <MenuItem
+                  key="delete"
+                  onClick={() => {
+                    handleDeleteClick(selectedId!);
+                  }}
+                >
                   Delete
                 </MenuItem>,
                 /* Tambahkan opsi Update Status untuk Pengawas Lab */
@@ -598,7 +623,7 @@ export default function PeminjamanTable() {
       >
         <DialogTitle>Update Status Pengajuan</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             <FormControl fullWidth>
               <InputLabel id="status-label">Status</InputLabel>
               <Select
@@ -624,7 +649,9 @@ export default function PeminjamanTable() {
                 label="Alasan Penolakan"
                 variant="outlined"
                 value={rejectionReason}
-                onChange={(e) => { setRejectionReason(e.target.value); }}
+                onChange={(e) => {
+                  setRejectionReason(e.target.value);
+                }}
                 error={!rejectionReason.trim()}
                 helperText={!rejectionReason.trim() ? 'Alasan penolakan harus diisi' : ''}
                 placeholder="Masukkan alasan penolakan secara detail"
@@ -661,7 +688,13 @@ export default function PeminjamanTable() {
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => { setConfirmDeleteOpen(false); }} color="primary" disabled={isDeleting}>
+          <Button
+            onClick={() => {
+              setConfirmDeleteOpen(false);
+            }}
+            color="primary"
+            disabled={isDeleting}
+          >
             Batal
           </Button>
           <Button onClick={confirmDelete} color="error" disabled={isDeleting}>
@@ -673,10 +706,18 @@ export default function PeminjamanTable() {
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
-        onClose={() => { setSnackbarOpen(false); }}
+        onClose={() => {
+          setSnackbarOpen(false);
+        }}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={() => { setSnackbarOpen(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={() => {
+            setSnackbarOpen(false);
+          }}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
