@@ -58,15 +58,9 @@ interface Values {
 }
 
 export default function PerbaikanTable() {
-  const { perbaikan, totalData, currentPage, getPerbaikan, updatePerbaikanStatus, deletePerbaikan } =
-    usePerbaikan();
+  const { perbaikan, totalData, currentPage, getPerbaikan, updatePerbaikanStatus, deletePerbaikan } = usePerbaikan();
 
-  const {
-    departemenFilter,
-    statusPengajuanFilter,
-    statusAsetFilter,
-    searchQuery,
-  } = usePerbaikanFilter();
+  const { departemenFilter, statusPengajuanFilter, statusAsetFilter, searchQuery, setFilteredPerbaikan } = usePerbaikanFilter();
 
   const { departemen } = useDepartemen();
   const router = useRouter();
@@ -97,39 +91,43 @@ export default function PerbaikanTable() {
       return perbaikan.Alat?.nama || 'Alat';
     } else if (perbaikan.fasilitasId) {
       return perbaikan.Fasilitas?.nama || 'Fasilitas';
-    } 
-      return '-';
-    
+    }
+    return '-';
   };
 
   const filteredData = React.useMemo(() => {
     return perbaikan.filter((item) => {
-      const matchDepartemen = departemenFilter === 'All' || item.Departemen?.nama === departemenFilter;
+      const matchDepartemen = departemenFilter === 'All' || item.departemenId === departemenFilter;
       const matchStatus = statusPengajuanFilter === 'All' || item.statusPengajuan === statusPengajuanFilter;
       const matchAset = statusAsetFilter === 'All' || item.statusAset === statusAsetFilter;
 
-      if (!searchQuery.trim()) return true; // Jika search query kosong, tampilkan semua
+      if (!searchQuery) return matchDepartemen && matchStatus && matchAset;
 
       const searchTerms = searchQuery
         .toLowerCase()
-        .split(' ')
+        .split(/\s+/)
         .filter((term) => term.length > 0);
 
       const searchableFields = [
-        item.deskripsi,
-        item.namaPengaju?.namaLengkap,
-        item.namaPenyetujuPerbaikan?.namaLengkap,
-        item.kondisiAset,
-        item.deskripsiPenolakan,
+        item.deskripsi?.toLowerCase()|| '',,
+        item.namaPengaju?.namaLengkap?.toLowerCase()|| '',
+        item.namaPenyetujuPerbaikan?.namaLengkap?.toLowerCase()|| '',
+        item.kondisiAset?.toLowerCase()|| '',
+        item.deskripsiPenolakan?.toLowerCase()|| '',
         getAsetName(item as Values),
-        departemen.find((d) => d.id === item.departemenId)?.nama,
-      ].map((field) => field?.toLowerCase() || '');
+        item.Departemen?.nama || '',
+      ];
 
-      const matchSearch = searchTerms.every((term) => searchableFields.some((field) => field.includes(term)));
+      const matchSearch =
+        searchTerms.length === 0 || searchTerms.every((term) => searchableFields.some((field) => field.includes(term)));
 
       return matchDepartemen && matchStatus && matchAset && matchSearch;
     });
   }, [perbaikan, departemenFilter, statusPengajuanFilter, statusAsetFilter, searchQuery]);
+
+  React.useEffect(() => {
+    setFilteredPerbaikan(filteredData);
+  }, [filteredData, setFilteredPerbaikan]);
 
   const currentData = React.useMemo(() => {
     const startIndex = page * rowsPerPage;
@@ -391,10 +389,20 @@ export default function PerbaikanTable() {
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
         {allowedRoles.includes(user?.role || '')
           ? [
-              <MenuItem key="edit" onClick={() => { handleEditClick(selectedId!); }}>
+              <MenuItem
+                key="edit"
+                onClick={() => {
+                  handleEditClick(selectedId!);
+                }}
+              >
                 Edit
               </MenuItem>,
-              <MenuItem key="delete" onClick={() => { handleDeleteClick(selectedId!); }}>
+              <MenuItem
+                key="delete"
+                onClick={() => {
+                  handleDeleteClick(selectedId!);
+                }}
+              >
                 Delete
               </MenuItem>,
               <MenuItem
@@ -411,10 +419,20 @@ export default function PerbaikanTable() {
           : perbaikan.find((p) => p.id === selectedId)?.statusPengajuan !== 'SELESAI' &&
             perbaikan.find((p) => p.id === selectedId)?.statusPengajuan !== 'DISETUJUI' &&
             perbaikan.find((p) => p.id === selectedId)?.statusPengajuan !== 'DITOLAK' && [
-              <MenuItem key="edit" onClick={() => { handleEditClick(selectedId!); }}>
+              <MenuItem
+                key="edit"
+                onClick={() => {
+                  handleEditClick(selectedId!);
+                }}
+              >
                 Edit
               </MenuItem>,
-              <MenuItem key="delete" onClick={() => { handleDeleteClick(selectedId!); }}>
+              <MenuItem
+                key="delete"
+                onClick={() => {
+                  handleDeleteClick(selectedId!);
+                }}
+              >
                 Delete
               </MenuItem>,
             ]}
@@ -432,7 +450,7 @@ export default function PerbaikanTable() {
       >
         <DialogTitle>Update Status Pengajuan</DialogTitle>
         <DialogContent>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
             <FormControl fullWidth>
               <InputLabel id="status-label">Status</InputLabel>
               <Select
@@ -459,7 +477,9 @@ export default function PerbaikanTable() {
                 label="Alasan Penolakan"
                 variant="outlined"
                 value={rejectionReason}
-                onChange={(e) => { setRejectionReason(e.target.value); }}
+                onChange={(e) => {
+                  setRejectionReason(e.target.value);
+                }}
                 error={!rejectionReason.trim()}
                 helperText={!rejectionReason.trim() ? 'Alasan penolakan harus diisi' : ''}
                 placeholder="Masukkan alasan penolakan secara detail"
@@ -492,11 +512,17 @@ export default function PerbaikanTable() {
         <DialogTitle>Konfirmasi Penghapusan</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Apakah anda yakin ingin menghapus peminjaman ini? Tindakan ini tidak dapat dibatalkan.
+            Apakah anda yakin ingin menghapus perbaikan ini? Tindakan ini tidak dapat dibatalkan.
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => { setConfirmDeleteOpen(false); }} color="primary" disabled={isDeleting}>
+          <Button
+            onClick={() => {
+              setConfirmDeleteOpen(false);
+            }}
+            color="primary"
+            disabled={isDeleting}
+          >
             Batal
           </Button>
           <Button onClick={confirmDelete} color="error" disabled={isDeleting}>
@@ -508,10 +534,18 @@ export default function PerbaikanTable() {
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
-        onClose={() => { setSnackbarOpen(false); }}
+        onClose={() => {
+          setSnackbarOpen(false);
+        }}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={() => { setSnackbarOpen(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={() => {
+            setSnackbarOpen(false);
+          }}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>

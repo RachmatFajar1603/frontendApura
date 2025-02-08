@@ -332,7 +332,13 @@ function EditPerbaikanForm() {
                     }}
                   >
                     <TableCell padding="checkbox">
-                      <Radio checked={isSelected} onChange={() => { handleAssetSelection(asset); }} disabled={disabled} />
+                      <Radio
+                        checked={isSelected}
+                        onChange={() => {
+                          handleAssetSelection(asset);
+                        }}
+                        disabled={disabled}
+                      />
                     </TableCell>
                     <TableCell>{asset.kode}</TableCell>
                     <TableCell>{asset.nama}</TableCell>
@@ -345,7 +351,9 @@ function EditPerbaikanForm() {
                       <TextField
                         type="number"
                         value={selectedAsset?.quantity || ''}
-                        onChange={(e) => { handleQuantityChange(asset.id, e.target.value); }}
+                        onChange={(e) => {
+                          handleQuantityChange(asset.id, e.target.value);
+                        }}
                         disabled={!selectedAsset}
                         InputProps={{
                           inputProps: {
@@ -493,7 +501,9 @@ function EditPerbaikanForm() {
                     multiline
                     rows={4}
                     value={deskripsi}
-                    onChange={(e) => { setDeskripsi(e.target.value); }}
+                    onChange={(e) => {
+                      setDeskripsi(e.target.value);
+                    }}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         backgroundColor: '#ffffff',
@@ -580,10 +590,6 @@ function EditPerbaikanForm() {
               sx={{
                 flex: { xs: '1', sm: '1 1 auto' },
                 minWidth: { xs: '100%', sm: '180px' },
-                bgcolor: '#9a221a',
-                '&:hover': {
-                  bgcolor: '#f04438',
-                },
               }}
             >
               {isSubmitting ? 'Memproses...' : 'Ajukan Perbaikan'}
@@ -597,10 +603,6 @@ function EditPerbaikanForm() {
               sx={{
                 flex: { xs: '1', sm: '1 1 auto' },
                 minWidth: { xs: '100%', sm: '120px' },
-                bgcolor: '#9a221a',
-                '&:hover': {
-                  bgcolor: '#f04438',
-                },
               }}
             >
               Next
@@ -611,17 +613,27 @@ function EditPerbaikanForm() {
         <Snackbar
           open={openSnackbar}
           autoHideDuration={6000}
-          onClose={() => { setOpenSnackbar(false); }}
+          onClose={() => {
+            setOpenSnackbar(false);
+          }}
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
-          <Alert onClose={() => { setOpenSnackbar(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          <Alert
+            onClose={() => {
+              setOpenSnackbar(false);
+            }}
+            severity={snackbarSeverity}
+            sx={{ width: '100%' }}
+          >
             {snackbarSeverity === 'success' ? successMessage : errorMessage}
           </Alert>
         </Snackbar>
 
-        {postError ? <Alert severity="error" sx={{ mt: 2 }}>
+        {postError ? (
+          <Alert severity="error" sx={{ mt: 2 }}>
             Error: {postError}
-          </Alert> : null}
+          </Alert>
+        ) : null}
       </Box>
     </LocalizationProvider>
   );

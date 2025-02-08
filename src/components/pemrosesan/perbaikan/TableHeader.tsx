@@ -44,7 +44,32 @@ function TableHeader() {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    setSearchQuery(value); // Akan menggunakan handler yang sudah dimodifikasi dari context
+    setSearchQuery(value);
+  };
+
+  const handleDepartemenChange = (e: any) => {
+    setDepartemenFilter(e.target.value);
+    // Reset related filters when department changes
+    if (e.target.value === 'All') {
+      setStatusPengajuanFilter('All');
+      setStatusAsetFilter('All');
+    }
+  };
+
+  const handleStatusPengajuanChange = (e: any) => {
+    setStatusPengajuanFilter(e.target.value);
+    if (e.target.value === 'All') {
+      setStatusAsetFilter('All');
+      setDepartemenFilter('All');
+    }
+  };
+
+  const handleStatusAsetChange = (e: any) => {
+    setStatusAsetFilter(e.target.value);
+    if (e.target.value === 'All') {
+      setStatusPengajuanFilter('All');
+      setDepartemenFilter('All');
+    }
   };
 
   const restrictedRoles = ['DEKAN', 'KADEP', 'WD2'];
@@ -106,22 +131,22 @@ function TableHeader() {
                 width: { xs: '100%', sm: 'auto' },
               }}
             >
-              {user?.role && !restrictedRoles.includes(user.role) ? <Link href="/perbaikan/perbaikan-create">
+              {user?.role && !restrictedRoles.includes(user.role) ? (
+                <Link href="/perbaikan/perbaikan-create">
                   <Button
                     id="perbaikan"
                     variant="contained"
                     fullWidth
                     aria-label="Perbaikan"
                     sx={{
-                      bgcolor: '#9a221a',
-                      '&:hover': { bgcolor: '#f04438' },
                       padding: '12px 16px',
                       minWidth: '120px',
                     }}
                   >
                     Perbaikan
                   </Button>
-                </Link> : null}
+                </Link>
+              ) : null}
               <Button
                 id="export"
                 variant="outlined"
@@ -154,18 +179,18 @@ function TableHeader() {
               width: '100%',
             }}
           >
-            <FormControl sx={{ width: { xs: '100%', md: 200 } }}>
+            <FormControl sx={{ width: { xs: '100%', md: 150 } }}>
               <InputLabel id="departemen-filter-label">Departemen</InputLabel>
               <Select
                 labelId="departemen-filter-label"
                 value={departemenFilter}
                 label="Departemen"
-                onChange={(e) => { setDepartemenFilter(e.target.value); }}
+                onChange={handleDepartemenChange}
                 size="small"
               >
                 <MenuItem value="All">All</MenuItem>
                 {departemen.map((dept) => (
-                  <MenuItem key={dept.id} value={dept.nama}>
+                  <MenuItem key={dept.id} value={dept.id}>
                     {dept.nama}
                   </MenuItem>
                 ))}
@@ -177,9 +202,9 @@ function TableHeader() {
               <Select
                 labelId="status-pengajuan-filter-label"
                 value={statusPengajuanFilter}
-                label="Status Pengajuan"
-                onChange={(e) => { setStatusPengajuanFilter(e.target.value); }}
+                onChange={handleStatusPengajuanChange}
                 size="small"
+                label="Status Pengajuan"
               >
                 {getUniqueStatusValues('statusPengajuan').map((status) => (
                   <MenuItem key={status} value={status}>
@@ -194,9 +219,9 @@ function TableHeader() {
               <Select
                 labelId="status-aset-filter-label"
                 value={statusAsetFilter}
-                label="Status Aset"
-                onChange={(e) => { setStatusAsetFilter(e.target.value); }}
+                onChange={handleStatusAsetChange}
                 size="small"
+                label="Status Aset"
               >
                 {getUniqueStatusValues('statusAset').map((status) => (
                   <MenuItem key={status} value={status}>
@@ -214,9 +239,9 @@ function TableHeader() {
               onChange={handleSearchChange}
               size="small"
               sx={{
-                width: { xs: '100%', md: 200 },
+                width: { xs: '100%', md: 150 },
               }}
-              placeholder="Cari berdasarkan nama peminjam..."
+              placeholder="Cari..."
             />
           </Box>
         </Box>
@@ -224,10 +249,18 @@ function TableHeader() {
       <Snackbar
         open={snackbarOpen}
         autoHideDuration={6000}
-        onClose={() => { setSnackbarOpen(false); }}
+        onClose={() => {
+          setSnackbarOpen(false);
+        }}
         anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <Alert onClose={() => { setSnackbarOpen(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        <Alert
+          onClose={() => {
+            setSnackbarOpen(false);
+          }}
+          severity={snackbarSeverity}
+          sx={{ width: '100%' }}
+        >
           {snackbarMessage}
         </Alert>
       </Snackbar>
