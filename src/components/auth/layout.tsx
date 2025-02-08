@@ -45,13 +45,13 @@ import RouterLink from 'next/link';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
+import { Building } from '@phosphor-icons/react/dist/ssr/Building';
+import { Clipboard } from '@phosphor-icons/react/dist/ssr/Clipboard';
+import { Shield } from '@phosphor-icons/react/dist/ssr/Shield';
+import { Users } from '@phosphor-icons/react/dist/ssr/Users';
 
 import { paths } from '@/paths';
 import { DynamicLogo } from '@/components/core/logo';
-import { Building } from '@phosphor-icons/react/dist/ssr/Building';
-import { Users } from '@phosphor-icons/react/dist/ssr/Users';
-import { Clipboard } from '@phosphor-icons/react/dist/ssr/Clipboard';
-import { Shield } from '@phosphor-icons/react/dist/ssr/Shield';
 
 export interface LayoutProps {
   children: React.ReactNode;
@@ -62,23 +62,24 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
     {
       icon: <Building size={24} />,
       title: 'Peminjaman & Penyewaan',
-      description: 'Layanan peminjaman ruangan dan alat laboratorium.'
+      description: 'Layanan peminjaman ruangan dan alat laboratorium.',
     },
     {
       icon: <Users size={24} />,
       title: 'Multi-Level Akses',
-      description: 'Sistem terintegrasi untuk mahasiswa (NPM), operator fakultas, kepala lab, kepala departemen, dan dekan (NIP). Serta masyarakat umum (NIK).'
+      description:
+        'Sistem terintegrasi untuk mahasiswa (NPM), operator fakultas, kepala lab, kepala departemen, dan dekan (NIP). Serta masyarakat umum (NIK).',
     },
     {
       icon: <Clipboard size={24} />,
       title: 'Manajemen Aset',
-      description: 'Pengelolaan inventaris laboratorium dan ruangan dengan sistem persetujuan bertingkat.'
+      description: 'Pengelolaan inventaris laboratorium dan ruangan dengan sistem persetujuan bertingkat.',
     },
     {
       icon: <Shield size={24} />,
       title: 'Fitur Utama',
-      description: 'Pengajuan online, tracking status, notifikasi persetujuan, dan laporan dalam format Excel.'
-    }
+      description: 'Pengajuan online, tracking status, notifikasi persetujuan, dan laporan dalam format Excel.',
+    },
   ];
 
   return (
@@ -116,17 +117,22 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
             right: 0,
             bottom: 0,
             background: 'linear-gradient(45deg, rgba(255, 204, 40, 0.1) 0%, rgba(255, 204, 40, 0.05) 100%)',
-            zIndex: 1
-          }
+            zIndex: 1,
+          },
         }}
       >
         <Stack spacing={4} sx={{ maxWidth: '480px', position: 'relative', zIndex: 2 }}>
           <Box textAlign="center">
-            <Typography variant="h3" component="h1" gutterBottom sx={{ 
-              fontWeight: 700, 
-              color: '#000000',
-              textShadow: '0 2px 4px rgba(0,0,0,0.05)'
-            }}>
+            <Typography
+              variant="h3"
+              component="h1"
+              gutterBottom
+              sx={{
+                fontWeight: 700,
+                color: '#000000',
+                textShadow: '0 2px 4px rgba(0,0,0,0.05)',
+              }}
+            >
               APURA FMIPA
             </Typography>
             <Typography variant="h6" sx={{ color: '#333333', mb: 4, fontWeight: 500 }}>
@@ -135,7 +141,7 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
               FMIPA USK
             </Typography>
           </Box>
-          
+
           <Stack spacing={3}>
             {features.map((feature, index) => (
               <Box
@@ -147,20 +153,19 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
                   borderRadius: 2,
                   backgroundColor: 'rgba(255, 255, 255, 0.9)',
                   backdropFilter: 'blur(8px)',
-                  transition: 'all 0.2s',
                   border: '1px solid rgba(255, 204, 40, 0.3)',
                   '&:hover': {
-                    transform: 'translateY(-2px)',
-                    boxShadow: '0 4px 12px rgba(255, 204, 40, 0.15)',
-                    backgroundColor: '#FFFFFF'
-                  }
+                    boxShadow: '0 8px 24px rgba(0, 0, 0, 0.15)',
+                  },
                 }}
               >
-                <Box sx={{ 
-                  color: '#FFAB00',
-                  display: 'flex',
-                  alignItems: 'flex-start'
-                }}>
+                <Box
+                  sx={{
+                    color: '#FFAB00',
+                    display: 'flex',
+                    alignItems: 'flex-start',
+                  }}
+                >
                   {feature.icon}
                 </Box>
                 <Box>
@@ -174,10 +179,10 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
               </Box>
             ))}
           </Stack>
-          
+
           <Box sx={{ mt: 4, textAlign: 'center' }}>
             <Typography variant="body2" sx={{ color: '#333333', fontWeight: 500 }}>
-            © 2025 APURA USK. All rights reserved.
+              © 2025 APURA USK. All rights reserved.
             </Typography>
           </Box>
         </Stack>

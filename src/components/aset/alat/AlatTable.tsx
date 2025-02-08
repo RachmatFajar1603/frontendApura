@@ -28,6 +28,7 @@ import {
 import { DotsThreeVertical } from '@phosphor-icons/react/dist/ssr/DotsThreeVertical';
 import { DownloadSimple } from '@phosphor-icons/react/dist/ssr/DownloadSimple';
 
+import api from '@/lib/api';
 import { useAlat } from '@/lib/aset/alat/useAlat';
 import { useAlatManage } from '@/lib/aset/alat/UseAlatManage';
 import { useAlatFilter } from '@/contexts/AlatContext';
@@ -78,6 +79,8 @@ export default function AlatTable() {
   const [isDeleting, setIsDeleting] = React.useState(false);
   const [qrCodeDialogOpen, setQrCodeDialogOpen] = React.useState(false);
   const [selectedQrCode, setSelectedQrCode] = React.useState<string | null>(null);
+  const [isRegeneratingQR, setIsRegeneratingQR] = React.useState(false);
+  const [secondConfirmDeleteOpen, setSecondConfirmDeleteOpen] = React.useState(false);
 
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
@@ -170,6 +173,11 @@ export default function AlatTable() {
     handleMenuClose();
   };
 
+  const handleFirstConfirmDelete = () => {
+    setConfirmDeleteOpen(false);
+    setSecondConfirmDeleteOpen(true);
+  };
+
   const confirmDelete = async () => {
     if (selectedAlatId) {
       setIsDeleting(true);
@@ -189,6 +197,7 @@ export default function AlatTable() {
       } finally {
         setIsDeleting(false);
         setConfirmDeleteOpen(false);
+        setSecondConfirmDeleteOpen(false);
         setSnackbarOpen(true);
         setSelectedAlatId(null);
       }
@@ -357,6 +366,33 @@ export default function AlatTable() {
         >
           Delete
         </MenuItem>
+        <MenuItem
+          onClick={async () => {
+            if (selectedAlatId) {
+              setIsRegeneratingQR(true);
+              try {
+                const response = await api.post(
+                  `${process.env.NEXT_PUBLIC_API_URL}/alat/${selectedAlatId}/regenerate-qr`
+                );
+                if (response.data) {
+                  setSnackbarMessage('QR Code berhasil di-generate ulang!');
+                  setSnackbarSeverity('success');
+                  await getAlatManage(currentPageAlatManage, rowsPerPageAlatManage);
+                }
+              } catch (error) {
+                setSnackbarMessage('Gagal men-generate ulang QR Code');
+                setSnackbarSeverity('error');
+              } finally {
+                setIsRegeneratingQR(false);
+                setSnackbarOpen(true);
+                handleMenuClose();
+              }
+            }
+          }}
+          disabled={isRegeneratingQR}
+        >
+          {isRegeneratingQR ? 'Generating...' : 'Regenerate QR Code'}
+        </MenuItem>
       </Menu>
 
       <Dialog open={qrCodeDialogOpen} onClose={() => setQrCodeDialogOpen(false)} maxWidth="sm" fullWidth>
@@ -380,9 +416,7 @@ export default function AlatTable() {
       <Dialog open={confirmDeleteOpen} onClose={() => !isDeleting && setConfirmDeleteOpen(false)}>
         <DialogTitle>Konfirmasi Penghapusan</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Apakah Anda yakin ingin menghapus alat ini? Tindakan ini tidak dapat dibatalkan.
-          </DialogContentText>
+          <DialogContentText>Apakah Anda yakin ingin menghapus data alat ini?</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button
@@ -394,8 +428,32 @@ export default function AlatTable() {
           >
             Batal
           </Button>
+          <Button onClick={handleFirstConfirmDelete} color="error" disabled={isDeleting}>
+            Lanjutkan
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={secondConfirmDeleteOpen} onClose={() => !isDeleting && setSecondConfirmDeleteOpen(false)}>
+        <DialogTitle>Peringatan Penghapusan</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            PERINGATAN: Tindakan ini akan menghapus data alat secara permanen dan tidak dapat dibatalkan. Apakah Anda
+            benar-benar yakin ingin melanjutkan?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setSecondConfirmDeleteOpen(false);
+            }}
+            color="primary"
+            disabled={isDeleting}
+          >
+            Batal
+          </Button>
           <Button onClick={confirmDelete} color="error" disabled={isDeleting}>
-            {isDeleting ? 'Menghapus...' : 'Hapus'}
+            {isDeleting ? 'Menghapus...' : 'Hapus Permanen'}
           </Button>
         </DialogActions>
       </Dialog>

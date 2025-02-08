@@ -38,8 +38,8 @@ import EditModal from './EditModal';
 export default function AsetRuanganTable() {
   const { deleteRuanganLab } = useRuanganLab();
   const { deleteRuanganUmum } = useRuanganUmum();
-  const { ruanganLabManage, loadingRuanganLabManage, getRuanganLabManage } = useRuanganLabManage();
-  const { ruanganUmumManage, loadingRuanganUmumManage, getRuanganUmumManage } = useRuanganUmumManage();
+  const { ruanganLabManage, loadingRuanganLabManage, getRuanganLabManage, currentPageRuanganLabManage, rowsPerPageRuanganLabManage } = useRuanganLabManage();
+  const { ruanganUmumManage, loadingRuanganUmumManage, getRuanganUmumManage, currentPageRuanganUmumManage, rowsPerPageRuanganUmumManage } = useRuanganUmumManage();
   const { selectedAsset, departemenFilter, gedungFilter, lantaiFilter, statusFilter, searchQuery, setFilteredRuangan } =
     useRuanganFilter();
   const { user } = useUsers();
@@ -53,6 +53,7 @@ export default function AsetRuanganTable() {
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
+  const [secondConfirmDeleteOpen, setSecondConfirmDeleteOpen] = React.useState(false);
 
   // const [filteredRows, setFilteredRows] = React.useState<any[]>([]);
   const [page, setPage] = React.useState(0);
@@ -154,10 +155,10 @@ export default function AsetRuanganTable() {
     try {
       if (selectedAsset === 'ruangan_umum') {
         await deleteRuanganUmum([selectedRow.id]);
-        await getRuanganUmumManage(); // Refresh data
+        await getRuanganUmumManage(currentPageRuanganUmumManage, rowsPerPageRuanganUmumManage); // Refresh data
       } else {
         await deleteRuanganLab([selectedRow.id]);
-        await getRuanganLabManage(); // Refresh data
+        await getRuanganLabManage(currentPageRuanganLabManage, rowsPerPageRuanganLabManage); // Refresh data
       }
       setSnackbarMessage('Ruangan berhasil dihapus!');
       setSnackbarSeverity('success');
@@ -167,16 +168,26 @@ export default function AsetRuanganTable() {
       setSnackbarSeverity('error');
     } finally {
       setSnackbarOpen(true);
+      setSecondConfirmDeleteOpen(false);
     }
   };
 
   const handleDialogOpen = () => {
-    setDialogOpen(true); // Buka dialog konfirmasi
-    handleClose(); // Tutup menu setelah dialog dibuka
+    setDialogOpen(true); // Buka dialog konfirmasi pertama
+    handleClose(); // Tutup menu
   };
 
   const handleDialogClose = () => {
-    setDialogOpen(false); // Tutup dialog jika dibatalkan
+    setDialogOpen(false); // Tutup dialog pertama
+  };
+
+  const handleFirstConfirmDelete = () => {
+    setDialogOpen(false); // Tutup dialog konfirmasi pertama
+    setSecondConfirmDeleteOpen(true); // Buka dialog konfirmasi kedua
+  };
+
+  const handleSecondConfirmClose = () => {
+    setSecondConfirmDeleteOpen(false); // Tutup dialog konfirmasi kedua
   };
 
   const handleChangePage = (event: unknown, newPage: number) => {
@@ -347,15 +358,32 @@ export default function AsetRuanganTable() {
         <DialogTitle>Konfirmasi Hapus</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Apakah Anda yakin ingin menghapus data ruangan ini? Tindakan ini tidak dapat dibatalkan.
+            Apakah Anda yakin ingin menghapus data ruangan ini?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose} color="primary">
             Batal
           </Button>
+          <Button onClick={handleFirstConfirmDelete} color="error">
+            Lanjutkan
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={secondConfirmDeleteOpen} onClose={handleSecondConfirmClose}>
+        <DialogTitle>Peringatan Penghapusan</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            PERINGATAN: Tindakan ini akan menghapus data ruangan secara permanen dan tidak dapat dibatalkan. Apakah Anda benar-benar yakin ingin melanjutkan?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleSecondConfirmClose} color="primary">
+            Batal
+          </Button>
           <Button onClick={handleDelete} color="error">
-            Hapus
+            Hapus Permanen
           </Button>
         </DialogActions>
       </Dialog>

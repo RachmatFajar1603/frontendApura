@@ -75,6 +75,7 @@ export default function FasilitasTable() {
   const [snackbarOpen, setSnackbarOpen] = React.useState(false);
   const [snackbarMessage, setSnackbarMessage] = React.useState('');
   const [confirmDeleteOpen, setConfirmDeleteOpen] = React.useState(false);
+  const [confirmDeleteFinalOpen, setConfirmDeleteFinalOpen] = React.useState(false);
   const [snackbarSeverity, setSnackbarSeverity] = React.useState<'success' | 'error'>('success');
   const [isDeleting, setIsDeleting] = React.useState(false);
 
@@ -165,6 +166,11 @@ export default function FasilitasTable() {
     handleMenuClose();
   };
 
+  const handleFirstConfirmDelete = () => {
+    setConfirmDeleteOpen(false);
+    setConfirmDeleteFinalOpen(true);
+  };
+
   const confirmDelete = async () => {
     if (seleectedFasilitasId) {
       setIsDeleting(true);
@@ -173,17 +179,16 @@ export default function FasilitasTable() {
         if (response && response.message === 'Successfully deleted fasilitas!') {
           setSnackbarMessage('Fasilitas berhasil dihapus!');
           setSnackbarSeverity('success');
-          await getFasilitasManage(currentPageFasilitasManage, rowsPerPageFasilitasManage); // Refresh data setelah sukses
+          await getFasilitasManage(currentPageFasilitasManage, rowsPerPageFasilitasManage);
         } else {
           throw new Error(response.message || 'Unexpected response from server');
         }
       } catch (error) {
-        console.error('Delete error:', error);
         setSnackbarMessage(`Terjadi kesalahan saat menghapus fasilitas: ${(error as Error).message}`);
-        setSnackbarSeverity('error');
+        setSnackbarSeverity('success');
       } finally {
         setIsDeleting(false);
-        setConfirmDeleteOpen(false);
+        setConfirmDeleteFinalOpen(false);
         setSnackbarOpen(true);
         setSelectedFasilitasId(null);
       }
@@ -341,9 +346,7 @@ export default function FasilitasTable() {
       <Dialog open={confirmDeleteOpen} onClose={() => !isDeleting && setConfirmDeleteOpen(false)}>
         <DialogTitle>Konfirmasi Penghapusan</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Apakah Anda yakin ingin menghapus fasilitas ini? Tindakan ini tidak dapat dibatalkan.
-          </DialogContentText>
+          <DialogContentText>Apakah Anda yakin ingin menghapus data fasilitas ini?</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button
@@ -355,8 +358,31 @@ export default function FasilitasTable() {
           >
             Batal
           </Button>
+          <Button onClick={handleFirstConfirmDelete} color="error" disabled={isDeleting}>
+            Lanjutkan
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={confirmDeleteFinalOpen} onClose={() => !isDeleting && setConfirmDeleteFinalOpen(false)}>
+        <DialogTitle>Peringatan Penghapusan</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+          PERINGATAN: Tindakan ini akan menghapus data fasilitas secara permanen dan tidak dapat dibatalkan. Apakah Anda benar-benar yakin ingin melanjutkan?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => {
+              setConfirmDeleteFinalOpen(false);
+            }}
+            color="primary"
+            disabled={isDeleting}
+          >
+            Batal
+          </Button>
           <Button onClick={confirmDelete} color="error" disabled={isDeleting}>
-            {isDeleting ? 'Menghapus...' : 'Hapus'}
+            {isDeleting ? 'Menghapus...' : 'Hapus Permanen'}
           </Button>
         </DialogActions>
       </Dialog>
