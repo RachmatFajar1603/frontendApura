@@ -217,27 +217,26 @@ const EditPenyewaanForm: React.FC = () => {
       if (exists) {
         // If unchecking, remove the facility
         return prev.filter((f) => f.id !== facilityId);
-      } 
-        // Check facility status and availability
-        const facility = fasilitas.find((f) => f.id === facilityId);
-        if (
-          facility &&
-          (facility.jumlah <= 0 ||
-            (facility.statusAset !== 'TERSEDIA' &&
-              facility.statusAset !== 'SEDANG_DISEWA' &&
-              facility.statusAset !== 'SEDANG_DIPINJAM'))
-        ) {
-          setErrorMessage('Hanya fasilitas dengan status TERSEDIA yang dapat dipilih.');
-          setSnackbarSeverity('error');
-          setOpenSnackbar(true);
-          return prev;
-        }
+      }
+      // Check facility status and availability
+      const facility = fasilitas.find((f) => f.id === facilityId);
+      if (
+        facility &&
+        (facility.jumlah <= 0 ||
+          (facility.statusAset !== 'TERSEDIA' &&
+            facility.statusAset !== 'SEDANG_DISEWA' &&
+            facility.statusAset !== 'SEDANG_DIPINJAM'))
+      ) {
+        setErrorMessage('Hanya fasilitas dengan status TERSEDIA yang dapat dipilih.');
+        setSnackbarSeverity('error');
+        setOpenSnackbar(true);
+        return prev;
+      }
 
-        // If checking, add the facility with original quantity if it exists, or previous quantity, or default to 1
-        const quantity = originalQuantities[facilityId] || prev.find((f) => f.id === facilityId)?.jumlahDisewa || 1;
+      // If checking, add the facility with original quantity if it exists, or previous quantity, or default to 1
+      const quantity = originalQuantities[facilityId] || prev.find((f) => f.id === facilityId)?.jumlahDisewa || 1;
 
-        return [...prev, { id: facilityId, jumlahDisewa: quantity }];
-      
+      return [...prev, { id: facilityId, jumlahDisewa: quantity }];
     });
   };
 
@@ -585,7 +584,9 @@ const EditPenyewaanForm: React.FC = () => {
                   edge="start"
                   disabled={isDisabled}
                   checked={isChecked}
-                  onChange={() => { handleFacilityToggle(roomId, facility.id); }}
+                  onChange={() => {
+                    handleFacilityToggle(roomId, facility.id);
+                  }}
                   tabIndex={-1}
                   disableRipple
                 />
@@ -629,7 +630,9 @@ const EditPenyewaanForm: React.FC = () => {
               <TextField
                 type="number"
                 value={isChecked ? selectedFasilitas.find((f) => f.id === facility.id)?.jumlahDisewa || 0 : 0}
-                onChange={(e) => { handleFacilityQuantityChange(facility.id, e.target.value); }}
+                onChange={(e) => {
+                  handleFacilityQuantityChange(facility.id, e.target.value);
+                }}
                 InputProps={{
                   inputProps: {
                     min: 1,
@@ -774,7 +777,9 @@ const EditPenyewaanForm: React.FC = () => {
                         <TextField
                           type="number"
                           value={selectedAsset?.quantity || ''}
-                          onChange={(e) => { handleQuantityChange(asset.id, e.target.value); }}
+                          onChange={(e) => {
+                            handleQuantityChange(asset.id, e.target.value);
+                          }}
                           disabled={!selectedAsset || asset.statusAset !== 'TERSEDIA' || asset.jumlah === 0}
                           InputProps={{
                             inputProps: {
@@ -815,7 +820,8 @@ const EditPenyewaanForm: React.FC = () => {
                       </Box>
                     </TableCell>
                   </TableRow>
-                  {selectedAssetType === 'ruanganUmum' && isSelected ? <TableRow>
+                  {selectedAssetType === 'ruanganUmum' && isSelected ? (
+                    <TableRow>
                       <TableCell colSpan={9}>
                         <Collapse in={isSelected}>
                           <Box
@@ -833,7 +839,8 @@ const EditPenyewaanForm: React.FC = () => {
                           </Box>
                         </Collapse>
                       </TableCell>
-                    </TableRow> : null}
+                    </TableRow>
+                  ) : null}
                 </React.Fragment>
               );
             })}
@@ -955,7 +962,9 @@ const EditPenyewaanForm: React.FC = () => {
                     multiline
                     rows={4}
                     value={tujuan}
-                    onChange={(e) => { setTujuan(e.target.value); }}
+                    onChange={(e) => {
+                      setTujuan(e.target.value);
+                    }}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         backgroundColor: '#ffffff',
@@ -970,7 +979,9 @@ const EditPenyewaanForm: React.FC = () => {
                   <DatePicker
                     label="Tanggal Mulai"
                     value={tanggalMulai}
-                    onChange={(newValue) => { handleDateChange(newValue, true); }}
+                    onChange={(newValue) => {
+                      handleDateChange(newValue, true);
+                    }}
                     slotProps={{
                       textField: {
                         fullWidth: true,
@@ -990,7 +1001,9 @@ const EditPenyewaanForm: React.FC = () => {
                   <DatePicker
                     label="Tanggal Selesai"
                     value={tanggalSelesai}
-                    onChange={(newValue) => { handleDateChange(newValue, false); }}
+                    onChange={(newValue) => {
+                      handleDateChange(newValue, false);
+                    }}
                     slotProps={{
                       textField: {
                         fullWidth: true,
@@ -1068,7 +1081,8 @@ const EditPenyewaanForm: React.FC = () => {
                       <Typography variant="body2" sx={{ color: 'text.primary' }}>
                         {ttdPenyewa ? extractFilename(ttdPenyewa) : 'Belum ada file yang diunggah'}
                       </Typography>
-                      {ttdPenyewa ? <Button
+                      {ttdPenyewa ? (
+                        <Button
                           color="error"
                           size="small"
                           onClick={handleRemoveFile}
@@ -1080,7 +1094,8 @@ const EditPenyewaanForm: React.FC = () => {
                           }}
                         >
                           Hapus
-                        </Button> : null}
+                        </Button>
+                      ) : null}
                     </Box>
                   </Box>
                 </Grid>
@@ -1353,7 +1368,8 @@ const EditPenyewaanForm: React.FC = () => {
                     {buktiPembayaran ? extractFilename(buktiPembayaran) : 'Belum ada file yang diunggah'}
                   </Typography>
 
-                  {buktiPembayaran ? <Button
+                  {buktiPembayaran ? (
+                    <Button
                       color="error"
                       size="small"
                       onClick={handleRemoveFileBuktiPembayaran}
@@ -1365,7 +1381,8 @@ const EditPenyewaanForm: React.FC = () => {
                       }}
                     >
                       Hapus
-                    </Button> : null}
+                    </Button>
+                  ) : null}
                 </Box>
               </Box>
             </CardContent>
@@ -1451,10 +1468,6 @@ const EditPenyewaanForm: React.FC = () => {
               sx={{
                 flex: { xs: '1', sm: '1 1 auto' },
                 minWidth: { xs: '100%', sm: '180px' },
-                bgcolor: '#9a221a',
-                '&:hover': {
-                  bgcolor: '#f04438',
-                },
               }}
             >
               {isSubmitting ? 'Memproses...' : 'Update Penyewaan'}
@@ -1468,10 +1481,6 @@ const EditPenyewaanForm: React.FC = () => {
               sx={{
                 flex: { xs: '1', sm: '1 1 auto' },
                 minWidth: { xs: '100%', sm: '120px' },
-                bgcolor: '#9a221a',
-                '&:hover': {
-                  bgcolor: '#f04438',
-                },
               }}
             >
               Next
@@ -1482,17 +1491,27 @@ const EditPenyewaanForm: React.FC = () => {
         <Snackbar
           open={openSnackbar}
           autoHideDuration={6000}
-          onClose={() => { setOpenSnackbar(false); }}
+          onClose={() => {
+            setOpenSnackbar(false);
+          }}
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
-          <Alert onClose={() => { setOpenSnackbar(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          <Alert
+            onClose={() => {
+              setOpenSnackbar(false);
+            }}
+            severity={snackbarSeverity}
+            sx={{ width: '100%' }}
+          >
             {snackbarSeverity === 'success' ? successMessage : errorMessage}
           </Alert>
         </Snackbar>
 
-        {updateError ? <Alert severity="error" sx={{ mt: 2 }}>
+        {updateError ? (
+          <Alert severity="error" sx={{ mt: 2 }}>
             Error: {updateError}
-          </Alert> : null}
+          </Alert>
+        ) : null}
       </Box>
     </LocalizationProvider>
   );

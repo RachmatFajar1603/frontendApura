@@ -197,9 +197,8 @@ function PenyewaanForm() {
       const isSelected = prevSelectedAssets.some((selectedAsset) => selectedAsset.id === asset.id);
       if (isSelected) {
         return prevSelectedAssets.filter((selectedAsset) => selectedAsset.id !== asset.id);
-      } 
-        return [...prevSelectedAssets, { ...asset, quantity: 1, selectedFacilities: [] }];
-      
+      }
+      return [...prevSelectedAssets, { ...asset, quantity: 1, selectedFacilities: [] }];
     });
   };
 
@@ -349,7 +348,7 @@ function PenyewaanForm() {
   };
 
   function formatRupiahTabel(angka: any) {
-    return `Rp ${  angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
+    return `Rp ${angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
   }
 
   const formatRupiah = (amount: number) => {
@@ -448,12 +447,11 @@ function PenyewaanForm() {
             ruangUmumId: asset.id,
             fasilitasId: facilityData.length > 0 ? facilityData : undefined,
           };
-        } 
-          return {
-            ...basePenyewaan,
-            [selectedAssetType === 'ruanganLab' ? 'ruangLabId' : 'alatId']: asset.id,
-          };
-        
+        }
+        return {
+          ...basePenyewaan,
+          [selectedAssetType === 'ruanganLab' ? 'ruangLabId' : 'alatId']: asset.id,
+        };
       });
 
       await Promise.all(penyewaanRequests.map((penyewaan) => postPenyewaan(penyewaan)));
@@ -550,7 +548,9 @@ function PenyewaanForm() {
               <TextField
                 type="number"
                 value={isChecked ? facilityQuantities[facility.id] || '' : ''}
-                onChange={(e) => { handleFacilityQuantityChange(roomId, facility.id, e.target.value); }}
+                onChange={(e) => {
+                  handleFacilityQuantityChange(roomId, facility.id, e.target.value);
+                }}
                 InputProps={{
                   inputProps: {
                     min: 1,
@@ -657,7 +657,9 @@ function PenyewaanForm() {
                     <TableCell padding="checkbox">
                       <Checkbox
                         checked={isSelected}
-                        onChange={() => { handleAssetSelection(asset); }}
+                        onChange={() => {
+                          handleAssetSelection(asset);
+                        }}
                         disabled={asset.statusAset !== 'TERSEDIA' || asset.jumlah === 0}
                       />
                     </TableCell>
@@ -673,7 +675,9 @@ function PenyewaanForm() {
                         <TextField
                           type="number"
                           value={selectedAsset?.quantity || ''}
-                          onChange={(e) => { handleQuantityChange(asset.id, e.target.value); }}
+                          onChange={(e) => {
+                            handleQuantityChange(asset.id, e.target.value);
+                          }}
                           disabled={!selectedAsset}
                           InputProps={{
                             inputProps: {
@@ -724,7 +728,8 @@ function PenyewaanForm() {
                       </Box>
                     </TableCell>
                   </TableRow>
-                  {selectedAssetType === 'ruanganUmum' && isSelected ? <TableRow>
+                  {selectedAssetType === 'ruanganUmum' && isSelected ? (
+                    <TableRow>
                       <TableCell colSpan={9}>
                         <Collapse in={isSelected}>
                           <Box
@@ -742,7 +747,8 @@ function PenyewaanForm() {
                           </Box>
                         </Collapse>
                       </TableCell>
-                    </TableRow> : null}
+                    </TableRow>
+                  ) : null}
                 </React.Fragment>
               );
             })}
@@ -849,7 +855,9 @@ function PenyewaanForm() {
                     multiline
                     rows={4}
                     value={tujuan}
-                    onChange={(e) => { setTujuan(e.target.value); }}
+                    onChange={(e) => {
+                      setTujuan(e.target.value);
+                    }}
                     sx={{
                       '& .MuiOutlinedInput-root': {
                         backgroundColor: '#ffffff',
@@ -864,7 +872,9 @@ function PenyewaanForm() {
                   <DatePicker
                     label="Tanggal Mulai"
                     value={tanggalMulai}
-                    onChange={(newValue) => { handleDateChange(newValue, true); }}
+                    onChange={(newValue) => {
+                      handleDateChange(newValue, true);
+                    }}
                     slotProps={{
                       textField: {
                         fullWidth: true,
@@ -884,7 +894,9 @@ function PenyewaanForm() {
                   <DatePicker
                     label="Tanggal Selesai"
                     value={tanggalSelesai}
-                    onChange={(newValue) => { handleDateChange(newValue, false); }}
+                    onChange={(newValue) => {
+                      handleDateChange(newValue, false);
+                    }}
                     slotProps={{
                       textField: {
                         fullWidth: true,
@@ -962,7 +974,8 @@ function PenyewaanForm() {
                       <Typography variant="body2" sx={{ color: 'text.primary' }}>
                         {ttdPenyewa ? ttdPenyewa.name : 'Belum ada file yang diunggah'}
                       </Typography>
-                      {ttdPenyewa ? <Button
+                      {ttdPenyewa ? (
+                        <Button
                           color="error"
                           size="small"
                           onClick={handleRemoveFile}
@@ -974,7 +987,8 @@ function PenyewaanForm() {
                           }}
                         >
                           Hapus
-                        </Button> : null}
+                        </Button>
+                      ) : null}
                     </Box>
                   </Box>
                 </Grid>
@@ -1162,7 +1176,8 @@ function PenyewaanForm() {
                           </Box>
 
                           {/* Facilities for Room */}
-                          {selectedAssetType === 'ruanganUmum' && selectedFacilities[asset.id] ? <Box sx={{ ml: 3, mt: 1, mb: 2 }}>
+                          {selectedAssetType === 'ruanganUmum' && selectedFacilities[asset.id] ? (
+                            <Box sx={{ ml: 3, mt: 1, mb: 2 }}>
                               <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
                                 Fasilitas yang Disewa:
                               </Typography>
@@ -1196,7 +1211,8 @@ function PenyewaanForm() {
                                   </Box>
                                 );
                               })}
-                            </Box> : null}
+                            </Box>
+                          ) : null}
                         </React.Fragment>
                       ))}
 
@@ -1305,7 +1321,8 @@ function PenyewaanForm() {
                     {buktiPembayaran ? buktiPembayaran.name : 'Belum ada bukti pembayaran'}
                   </Typography>
 
-                  {buktiPembayaran ? <Button
+                  {buktiPembayaran ? (
+                    <Button
                       color="error"
                       size="small"
                       onClick={handleRemoveFileBuktiPembayaran}
@@ -1317,7 +1334,8 @@ function PenyewaanForm() {
                       }}
                     >
                       Hapus
-                    </Button> : null}
+                    </Button>
+                  ) : null}
                 </Box>
               </Box>
             </CardContent>
@@ -1395,10 +1413,6 @@ function PenyewaanForm() {
               sx={{
                 flex: { xs: '1', sm: '1 1 auto' },
                 minWidth: { xs: '100%', sm: '180px' },
-                bgcolor: '#9a221a',
-                '&:hover': {
-                  bgcolor: '#f04438',
-                },
               }}
             >
               {loadingPost ? 'Memproses...' : 'Ajukan Penyewaan'}
@@ -1412,10 +1426,6 @@ function PenyewaanForm() {
               sx={{
                 flex: { xs: '1', sm: '1 1 auto' },
                 minWidth: { xs: '100%', sm: '120px' },
-                bgcolor: '#9a221a',
-                '&:hover': {
-                  bgcolor: '#f04438',
-                },
               }}
             >
               Next
@@ -1426,17 +1436,27 @@ function PenyewaanForm() {
         <Snackbar
           open={openSnackbar}
           autoHideDuration={6000}
-          onClose={() => { setOpenSnackbar(false); }}
+          onClose={() => {
+            setOpenSnackbar(false);
+          }}
           anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
         >
-          <Alert onClose={() => { setOpenSnackbar(false); }} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          <Alert
+            onClose={() => {
+              setOpenSnackbar(false);
+            }}
+            severity={snackbarSeverity}
+            sx={{ width: '100%' }}
+          >
             {snackbarSeverity === 'success' ? successMessage : errorMessage}
           </Alert>
         </Snackbar>
 
-        {postError ? <Alert severity="error" sx={{ mt: 2 }}>
+        {postError ? (
+          <Alert severity="error" sx={{ mt: 2 }}>
             Error: {postError}
-          </Alert> : null}
+          </Alert>
+        ) : null}
       </Box>
     </LocalizationProvider>
   );
