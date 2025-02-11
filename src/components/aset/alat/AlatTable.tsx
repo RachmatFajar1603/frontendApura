@@ -204,6 +204,22 @@ export default function AlatTable() {
     }
   };
 
+  const handleDownloadQR = () => {
+    if (selectedQrCode) {
+      const link = document.createElement('a');
+      const dataUrl = selectedQrCode.startsWith('data:image')
+        ? selectedQrCode
+        : `data:image/png;base64,${selectedQrCode}`;
+
+      link.href = dataUrl;
+      link.download = 'qr-code.png';
+
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   if (loadingAlatManage) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
@@ -264,7 +280,7 @@ export default function AlatTable() {
               <TableCell>Status</TableCell>
               <TableCell>Jumlah</TableCell>
               <TableCell>Shift</TableCell>
-              <TableCell>QR Code</TableCell>
+              {user?.role && allowedRoles.includes(user.role) ? <TableCell>QR Code</TableCell> : null}
               {user?.role && allowedRoles.includes(user.role) ? <TableCell>Aksi</TableCell> : null}
             </TableRow>
           </TableHead>
@@ -312,17 +328,19 @@ export default function AlatTable() {
                     {item.shift?.jamMulai} - {item.shift?.jamSelesai}
                   </Typography>
                 </TableCell>
-                <TableCell>
-                  {item.qrCode ? (
-                    <IconButton onClick={() => handleQrCodeClick(item.qrCode)} title="Lihat QR Code">
-                      <DownloadSimple />
-                    </IconButton>
-                  ) : (
-                    <Typography variant="body2" color="text.secondary">
-                      Tidak ada QR Code
-                    </Typography>
-                  )}
-                </TableCell>
+                {user?.role && allowedRoles.includes(user.role) ? (
+                  <TableCell>
+                    {item.qrCode ? (
+                      <IconButton onClick={() => handleQrCodeClick(item.qrCode)} title="Lihat QR Code">
+                        <DownloadSimple />
+                      </IconButton>
+                    ) : (
+                      <Typography variant="body2" color="text.secondary">
+                        Tidak ada QR Code
+                      </Typography>
+                    )}
+                  </TableCell>
+                ) : null}
                 {user?.role && allowedRoles.includes(user.role) ? (
                   <TableCell>
                     <IconButton
@@ -396,18 +414,31 @@ export default function AlatTable() {
       </Menu>
 
       <Dialog open={qrCodeDialogOpen} onClose={() => setQrCodeDialogOpen(false)} maxWidth="sm" fullWidth>
-        <DialogTitle>QR Code Data Aset Alat</DialogTitle>
-        <DialogContent sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', py: 3 }}>
+        <DialogTitle>QR Code</DialogTitle>
+        <DialogContent sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', py: 3 }}>
           {selectedQrCode && (
-            <img
-              src={selectedQrCode.startsWith('data:image') ? selectedQrCode : `data:image/png;base64,${selectedQrCode}`}
-              alt="QR Code"
-              style={{ width: '300px', height: '300px' }}
-            />
+            <>
+              <img
+                src={
+                  selectedQrCode.startsWith('data:image') ? selectedQrCode : `data:image/png;base64,${selectedQrCode}`
+                }
+                alt="QR Code"
+                style={{ width: '300px', height: '300px', marginBottom: '20px' }}
+              />
+              <Button
+                variant="contained"
+                color="primary"
+                startIcon={<DownloadSimple />}
+                onClick={handleDownloadQR}
+                sx={{ mt: 2 }}
+              >
+                Download QR Code
+              </Button>
+            </>
           )}
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setQrCodeDialogOpen(false)} color="primary">
+          <Button onClick={() => setQrCodeDialogOpen(false)} color="error">
             Tutup
           </Button>
         </DialogActions>

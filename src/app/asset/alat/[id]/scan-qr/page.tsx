@@ -40,7 +40,7 @@ export default function AlatQRScanPage() {
 
   if (loading) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Box display="flex" justifyContent="center" alignItems="center" flex={1}>
         <CircularProgress />
       </Box>
     );
@@ -48,7 +48,7 @@ export default function AlatQRScanPage() {
 
   if (error || fetchError) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Box display="flex" justifyContent="center" alignItems="center" flex={1}>
         <Paper elevation={3} sx={{ p: 3, backgroundColor: '#FFF3F0' }}>
           <Typography color="error" variant="h6" textAlign="center">
             {error || fetchError}
@@ -60,7 +60,7 @@ export default function AlatQRScanPage() {
 
   if (!alatDetail) {
     return (
-      <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh">
+      <Box display="flex" justifyContent="center" alignItems="center" flex={1}>
         <Paper elevation={3} sx={{ p: 3 }}>
           <Typography variant="h6" textAlign="center">
             Alat tidak ditemukan
@@ -84,19 +84,19 @@ export default function AlatQRScanPage() {
   };
 
   return (
-    <Box display="flex" justifyContent="center" alignItems="center" minHeight="100vh" p={2}>
-      <Card sx={{ maxWidth: 600, width: '100%', borderRadius: 2 }} elevation={4}>
+    <Box display="flex" justifyContent="center" alignItems="center" flex={1} p={2} sx={{ overflow: 'hidden' }}>
+      <Card sx={{ maxWidth: 600, width: '100%', borderRadius: 2, maxHeight: 'calc(100vh - 120px)', overflow: 'auto' }} elevation={4}>
         <CardContent>
-          <Box display="flex" alignItems="center" mb={3}>
+          <Box display="flex" alignItems="center" mb={2}>
             <QrCode size={40} style={{ marginRight: 16, color: 'var(--primary-main)' }} />
             <Typography variant="h5" component="div" fontWeight="bold">
               Detail Peralatan
             </Typography>
           </Box>
 
-          <Divider sx={{ mb: 3 }} />
+          <Divider sx={{ mb: 2 }} />
 
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
             {/* Basic Info Section */}
             <Grid item xs={12}>
               <Box mb={2}>
@@ -149,7 +149,7 @@ export default function AlatQRScanPage() {
 
             {/* Location Section with Department, Lab and Shift */}
             <Grid item xs={12}>
-              <Box mb={2}>
+              <Box>
                 <Typography variant="h6" color="primary" gutterBottom>
                   <MapPinLine style={{ marginRight: 1, verticalAlign: 'middle' }} />
                   Lokasi
