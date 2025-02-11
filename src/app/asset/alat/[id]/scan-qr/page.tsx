@@ -74,7 +74,7 @@ export default function AlatQRScanPage() {
     switch (status) {
       case 'TERSEDIA':
         return '#3A7D44';
-      case 'DIPERBAIKI':
+      case 'SEDANG_DIPERBAIKI':
         return '#FBA518';
       case 'TIDAK_TERSEDIA':
         return '#D70654';
