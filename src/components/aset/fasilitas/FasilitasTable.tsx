@@ -44,7 +44,7 @@ interface Values {
   departemenId: string;
   gedungId: string;
   lantai: number;
-  harga?: string;
+  harga?: number;
   statusAset: string;
   jumlah: number;
   departemen?: any;
@@ -154,7 +154,12 @@ export default function FasilitasTable() {
   const handleEditClick = (fasilitasId: string) => {
     const fasilitasToEdit = fasilitasManage.find((fasilitas) => fasilitas.id === fasilitasId);
     if (fasilitasToEdit) {
-      setSelectedFasilitasData(fasilitasToEdit); // Set data pengguna yang akan diedit
+      // Convert harga from string to number if it exists
+      const formattedFasilitas = {
+        ...fasilitasToEdit,
+        harga: fasilitasToEdit.harga ? Number(fasilitasToEdit.harga) : undefined
+      };
+      setSelectedFasilitasData(formattedFasilitas); // Set data pengguna yang akan diedit
       setEditModalOpen(true); // Buka modal
     }
     handleMenuClose();
