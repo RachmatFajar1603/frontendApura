@@ -1202,10 +1202,10 @@ function PenyewaanForm() {
                                     <Typography variant="body2">{facility.nama}</Typography>
                                     <Box sx={{ textAlign: 'right' }}>
                                       <Typography variant="body2">
-                                        {quantity} x {formatRupiah(facility.harga)} / hari
+                                        {quantity} x {formatRupiah(facility.harga || 0)} / hari
                                       </Typography>
                                       <Typography variant="body2" color="text.secondary">
-                                        Total: {formatRupiah(quantity * facility.harga)}
+                                        Total: {formatRupiah(quantity * (facility.harga || 0))}
                                       </Typography>
                                     </Box>
                                   </Box>
@@ -1241,7 +1241,7 @@ function PenyewaanForm() {
                                 const facilitiesTotal = selectedFacilities[asset.id].reduce((facTotal, facilityId) => {
                                   const facility = fasilitas.find((f) => f.id === facilityId);
                                   const quantity = facilityQuantities[facilityId] || 1;
-                                  return facTotal + (facility ? quantity * facility.harga : 0);
+                                  return facTotal + (facility ? quantity * (facility.harga || 0) : 0);
                                 }, 0);
                                 assetTotal += facilitiesTotal;
                               }
