@@ -31,7 +31,7 @@ interface Values {
   departemenId: string;
   gedungId: string;
   lantai: number;
-  harga?: string;
+  harga?: number;
   statusAset: string;
   jumlah: number;
   departemen?: any;
@@ -63,7 +63,7 @@ const Modal: React.FC<AddAssetModalProps> = ({ open, handleClose }) => {
       departemenId: '',
       gedungId: '',
       lantai: 1,
-      harga: '',
+      harga: 0,
       statusAset: '',
       jumlah: 1,
     },
@@ -74,7 +74,7 @@ const Modal: React.FC<AddAssetModalProps> = ({ open, handleClose }) => {
       const dataToSubmit = {
         ...values,
         jumlah: Number(values.jumlah),
-        harga: values.harga ? String(values.harga).replace(/,/g, '') : undefined,
+        harga: values.harga ? Number(String(values.harga).replace(/,/g, '')) : undefined,
       };
       await postFasilitas(dataToSubmit);
       setSnackbar({ open: true, message: 'Fasilitas berhasil ditambahkan', severity: 'success' });
