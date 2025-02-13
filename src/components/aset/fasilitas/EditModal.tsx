@@ -34,7 +34,7 @@ interface Values {
   departemenId?: string;
   gedungId?: string;
   lantai: number;
-  harga?: string;
+  harga?: number;
   statusAset: string;
   jumlah: number;
   departemen?: any;
@@ -67,7 +67,7 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
       departemenId: '',
       gedungId: '',
       lantai: 1,
-      harga: '',
+      harga: 0,
       statusAset: '',
       jumlah: 1,
     },
@@ -94,7 +94,7 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
         jumlah: parseInt(values.jumlah.toString(), 10), // Konversi ke integer
         harga: values.harga
           ? typeof values.harga === 'string'
-            ? Number(values.harga.replace(/[^\d]/g, ''))
+            ? Number(String(values.harga).replace(/[^\d]/g, ''))
             : Number(values.harga)
           : undefined,
         departemen: { connect: { id: values.departemenId } },
@@ -106,12 +106,12 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
       if (initialData) {
         response = await updateFasilitas(values.id, {
           ...updateData,
-          harga: values.harga?.toString() || '0', // Ensure harga is a string
+          harga: Number(values.harga) || 0, // Convert to number
         });
       } else {
         response = await postFasilitas({
           ...updateData,
-          harga: values.harga?.toString() || '0', // Convert harga back to string
+          harga: Number(values.harga) || 0, // Convert to number
           departemenId: values.departemenId || '',
           gedungId: values.gedungId || '',
         });
@@ -184,7 +184,7 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
                     field.onChange(value);
                   }}
                   error={Boolean(errors.harga)}
-                  helperText={errors.harga?.message || 'Contoh: Rp 100,000'}
+                  helperText={errors.harga?.message?.toString() || 'Contoh: Rp 100,000'}
                   fullWidth
                   margin="normal"
                 />

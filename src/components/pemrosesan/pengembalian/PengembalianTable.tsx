@@ -508,7 +508,13 @@ export default function PengembalianTable() {
                     {pengembalian.kondisiAset}
                   </Box>
                 </TableCell>
-                <TableCell>{pengembalian.denda ? `Rp. ${pengembalian.denda.toLocaleString('id-ID')}` : '-'}</TableCell>
+                <TableCell>
+                  {pengembalian.kondisiAset === 'BAIK'
+                    ? '-'
+                    : pengembalian.denda
+                      ? `Rp. ${pengembalian.denda.toLocaleString('id-ID')}`
+                      : '-'}
+                </TableCell>
                 <TableCell>
                   <Box
                     sx={{

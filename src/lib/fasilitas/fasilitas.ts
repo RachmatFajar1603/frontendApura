@@ -13,7 +13,7 @@ export interface Fasilitas {
   departemenId: string;
   gedungId: string;
   lantai: number;
-  harga?: any;
+  harga?: number;
   statusAset: string;
   jumlah: number;
   departemen?: any;
