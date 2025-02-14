@@ -50,6 +50,7 @@ import { useFasilitas } from '@/lib/fasilitas/fasilitas';
 import { useGedung } from '@/lib/gedung/gedung';
 import { usePeminjaman } from '@/lib/pemrosesan/peminjaman';
 import { usePenyewaan } from '@/lib/pemrosesan/penyewaan';
+import { useCalendar } from '@/lib/pemrosesan/calendar';
 
 // import { useUsers } from '@/hooks/use-user';
 
@@ -127,6 +128,7 @@ const EditPeminjamanForm: React.FC = () => {
   const { departemen } = useDepartemen();
   const { gedung } = useGedung();
   const { getPeminjamanById, peminjaman, updatePeminjaman, error: updateError } = usePeminjaman();
+  const { calendarPeminjaman, calendarPenyewaan } = useCalendar();
   const { penyewaan } = usePenyewaan();
   // const { user } = useUsers();
   const { fasilitas } = useFasilitas();
@@ -299,7 +301,7 @@ const EditPeminjamanForm: React.FC = () => {
     }
 
     // Cek konflik dengan peminjaman yang ada
-    const peminjamanConflict = peminjaman.some((booking) => {
+    const peminjamanConflict = calendarPeminjaman.some((booking) => {
       // Skip jika status ditolak
       if (booking.statusPengajuan === 'DITOLAK') return false;
 
@@ -312,7 +314,7 @@ const EditPeminjamanForm: React.FC = () => {
     });
 
     // Cek konflik dengan penyewaan yang ada
-    const penyewaanConflict = penyewaan.some((booking) => {
+    const penyewaanConflict = calendarPenyewaan.some((booking) => {
       // Skip jika status ditolak
       if (booking.statusPengajuan === 'DITOLAK') return false;
 

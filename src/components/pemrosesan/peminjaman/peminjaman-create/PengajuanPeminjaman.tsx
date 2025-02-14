@@ -51,6 +51,7 @@ import { useRuanganUmum } from '@/lib/aset/RuanganUmum/useRuanganUmum';
 import { useDepartemen } from '@/lib/departemen/departemen';
 import { useFasilitas } from '@/lib/fasilitas/fasilitas';
 import { useGedung } from '@/lib/gedung/gedung';
+import { useCalendar } from '@/lib/pemrosesan/calendar';
 import { usePeminjaman } from '@/lib/pemrosesan/peminjaman';
 import { usePenyewaan } from '@/lib/pemrosesan/penyewaan';
 import { useUsers } from '@/hooks/use-user';
@@ -102,6 +103,7 @@ function PeminjamanForm() {
   const { departemen } = useDepartemen();
   const { gedung } = useGedung();
   const { postPeminjaman, peminjaman, error: postError } = usePeminjaman();
+  const { calendarPeminjaman, calendarPenyewaan } = useCalendar();
   const { penyewaan } = usePenyewaan();
   const { user } = useUsers();
   const { fasilitas, getFasilitas } = useFasilitas();
@@ -220,7 +222,7 @@ function PeminjamanForm() {
       return true;
     }
 
-    const peminjamanConflict = peminjaman.some((booking) => {
+    const peminjamanConflict = calendarPeminjaman.some((booking) => {
       if (booking.statusPengajuan === 'DITOLAK') return false;
 
       const relevantId = booking.ruangUmumId || booking.ruangLabId || booking.alatId;
@@ -231,7 +233,7 @@ function PeminjamanForm() {
       return selectedDate.isBetween(start, end, 'day', '[]');
     });
 
-    const penyewaanConflict = penyewaan.some((booking) => {
+    const penyewaanConflict = calendarPenyewaan.some((booking) => {
       if (booking.statusPengajuan === 'DITOLAK') return false;
 
       const relevantId = booking.ruangUmumId || booking.ruangLabId || booking.alatId;

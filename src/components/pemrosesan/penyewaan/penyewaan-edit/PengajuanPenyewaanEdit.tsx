@@ -55,6 +55,7 @@ import { useGedung } from '@/lib/gedung/gedung';
 import { usePeminjaman } from '@/lib/pemrosesan/peminjaman';
 import { usePenyewaan } from '@/lib/pemrosesan/penyewaan';
 import { useUsers } from '@/hooks/use-user';
+import { useCalendar } from '@/lib/pemrosesan/calendar';
 
 interface AssetDetails {
   id: string;
@@ -132,6 +133,7 @@ const EditPenyewaanForm: React.FC = () => {
   const { gedung } = useGedung();
   const { getPenyewaanById, penyewaan, updatePenyewaan, error: updateError } = usePenyewaan();
   const { peminjaman } = usePeminjaman();
+  const { calendarPeminjaman, calendarPenyewaan } = useCalendar();
   // const { user } = useUsers();
   const { fasilitas } = useFasilitas();
 
@@ -306,7 +308,7 @@ const EditPenyewaanForm: React.FC = () => {
     }
 
     // Cek konflik dengan peminjaman yang ada
-    const peminjamanConflict = peminjaman.some((booking) => {
+    const peminjamanConflict = calendarPeminjaman.some((booking) => {
       // Skip jika status ditolak
       if (booking.statusPengajuan === 'DITOLAK') return false;
 
@@ -319,7 +321,7 @@ const EditPenyewaanForm: React.FC = () => {
     });
 
     // Cek konflik dengan penyewaan yang ada
-    const penyewaanConflict = penyewaan.some((booking) => {
+    const penyewaanConflict = calendarPenyewaan.some((booking) => {
       // Skip jika status ditolak
       if (booking.statusPengajuan === 'DITOLAK') return false;
 
