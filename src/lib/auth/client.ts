@@ -11,6 +11,7 @@ export interface SignUpParams {
   email: string;
   phoneNumber: string;
   password: string;
+  isVerified?: boolean;
 }
 
 export interface resendVerificationParams {
