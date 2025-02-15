@@ -858,7 +858,7 @@ function PeminjamanForm() {
                     <Typography variant="caption" display="block" gutterBottom sx={{ color: 'text.secondary' }}>
                       {dragOver
                         ? 'Lepaskan file di sini'
-                        : 'Sebelum upload, pastikan untuk menghapus latar belakang atau sensitivitas data.'}
+                        : 'Sebelum upload, pastikan untuk menghapus latar belakang atau sensitivitas data. Maksimal size gambar 1MB.'}
                     </Typography>
                     <Box
                       sx={{

@@ -1067,7 +1067,7 @@ const EditPenyewaanForm: React.FC = () => {
                     <Typography variant="caption" display="block" gutterBottom sx={{ color: 'text.secondary' }}>
                       {dragOver
                         ? 'Lepaskan file di sini'
-                        : 'Sebelum upload, pastikan untuk menghapus latar belakang atau sensitivitas data.'}
+                        : 'Sebelum upload, pastikan untuk menghapus latar belakang atau sensitivitas data. Maksimal size gambar 1MB.'}
                     </Typography>
                     <Box
                       sx={{
@@ -1352,7 +1352,7 @@ const EditPenyewaanForm: React.FC = () => {
                 <Typography variant="caption" display="block" gutterBottom sx={{ color: 'text.secondary' }}>
                   {dragOver
                     ? 'Lepaskan file di sini'
-                    : 'Unggah bukti pembayaran (struk/transfer) dalam format JPG, PNG, atau PDF'}
+                    : 'Unggah bukti pembayaran (struk/transfer) dalam format JPG, PNG, atau JPEG. Maksimal size gambar 1MB.'}
                 </Typography>
 
                 <Box
