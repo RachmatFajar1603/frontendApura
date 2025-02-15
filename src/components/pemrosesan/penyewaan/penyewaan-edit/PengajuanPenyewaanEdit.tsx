@@ -52,10 +52,10 @@ import { useRuanganUmum } from '@/lib/aset/RuanganUmum/useRuanganUmum';
 import { useDepartemen } from '@/lib/departemen/departemen';
 import { useFasilitas } from '@/lib/fasilitas/fasilitas';
 import { useGedung } from '@/lib/gedung/gedung';
+import { useCalendar } from '@/lib/pemrosesan/calendar';
 import { usePeminjaman } from '@/lib/pemrosesan/peminjaman';
 import { usePenyewaan } from '@/lib/pemrosesan/penyewaan';
 import { useUsers } from '@/hooks/use-user';
-import { useCalendar } from '@/lib/pemrosesan/calendar';
 
 interface AssetDetails {
   id: string;
@@ -1186,7 +1186,7 @@ const EditPenyewaanForm: React.FC = () => {
                         Bank
                       </Typography>
                       <Typography variant="h6" fontWeight="bold">
-                        Bank Mandiri
+                        Bank BSI
                       </Typography>
                     </Paper>
                   </Grid>
@@ -1209,7 +1209,7 @@ const EditPenyewaanForm: React.FC = () => {
                         Nomor Rekening
                       </Typography>
                       <Typography variant="h6" fontWeight="bold">
-                        1234 5678 9012
+                        8314472024111184
                       </Typography>
                     </Paper>
                   </Grid>
@@ -1234,7 +1234,7 @@ const EditPenyewaanForm: React.FC = () => {
                           Atas Nama
                         </Typography>
                         <Typography variant="h6" fontWeight="bold">
-                          Universitas Contoh
+                          ASET FMIPA USK
                         </Typography>
                       </Box>
                     </Paper>
