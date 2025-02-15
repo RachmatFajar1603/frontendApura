@@ -129,8 +129,8 @@ export function SignUpForm(): React.JSX.Element {
             rules={{ required: 'NIK is required' }}
             render={({ field }) => (
               <FormControl error={Boolean(errors.noIdentitas)}>
-                <InputLabel>NIK/NPM</InputLabel>
-                <OutlinedInput {...field} label="NIK/NPM" type="text" />
+                <InputLabel>NIK</InputLabel>
+                <OutlinedInput {...field} label="NIK" type="number" />
                 {errors.noIdentitas ? <FormHelperText>{errors.noIdentitas.message}</FormHelperText> : null}
               </FormControl>
             )}
