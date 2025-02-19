@@ -179,7 +179,7 @@ export function SignUpForm(): React.JSX.Element {
             render={({ field }) => (
               <FormControl error={Boolean(errors.phoneNumber)}>
                 <InputLabel>Nomor Telepon</InputLabel>
-                <OutlinedInput {...field} label="Nomor Telepon" type="tel" />
+                <OutlinedInput {...field} label="Nomor Telepon" type="number" />
                 {errors.phoneNumber ? <FormHelperText>{errors.phoneNumber.message}</FormHelperText> : null}
               </FormControl>
             )}

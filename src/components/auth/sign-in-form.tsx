@@ -127,7 +127,7 @@ export function SignInForm(): React.JSX.Element {
                     onChange(val); // No need to convert to number
                   }}
                   label="NPM/NIP/NIK"
-                  type="text" // Change to text
+                  type="number" // Change to text
                 />
                 {errors.noIdentitas ? <FormHelperText>{errors.noIdentitas.message}</FormHelperText> : null}
               </FormControl>
