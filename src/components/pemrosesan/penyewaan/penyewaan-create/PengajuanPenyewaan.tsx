@@ -118,7 +118,7 @@ function PenyewaanForm() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const fileInputRefBuktiPembayaran = useRef<HTMLInputElement>(null);
 
-  const steps = ['Pilih Jenis Aset', 'Pilih Aset', 'Detail Penyewaan', 'Pembayaran'];
+  const steps = ['Pilih Jenis Aset', 'Pilih Aset', 'Detail Penyewaan', 'Detail Pembayaran'];
 
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
@@ -697,7 +697,12 @@ function PenyewaanForm() {
                         />
                       </TableCell>
                     )}
-                    <TableCell>Rp. {asset.harga.toLocaleString('id-ID')}</TableCell>
+                    <TableCell>
+                      <div>Rp. {asset.harga.toLocaleString('id-ID')}</div>
+                      {selectedAssetType === 'alat' && selectedAsset?.id === asset.id && (
+                        <div>Total: Rp. {(asset.harga * (selectedAsset?.quantity || 1)).toLocaleString('id-ID')}</div>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
                         {asset.shift?.namaShift}

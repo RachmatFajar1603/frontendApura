@@ -141,7 +141,7 @@ const EditPenyewaanForm: React.FC = () => {
 
   const theme = useTheme();
 
-  const steps = ['Pilih Jenis Aset', 'Pilih Aset', 'Detail Penyewaan', 'Pembayaran'];
+  const steps = ['Pilih Jenis Aset', 'Pilih Aset', 'Detail Penyewaan', 'Detail Pembayaran'];
 
   useEffect(() => {
     const fetchData = async () => {
@@ -799,7 +799,12 @@ const EditPenyewaanForm: React.FC = () => {
                         />
                       </TableCell>
                     )}
-                    <TableCell>{asset.harga}</TableCell>
+                    <TableCell>
+                      <div>Rp. {asset.harga.toLocaleString('id-ID')}</div>
+                      {selectedAssetType === 'alat' && selectedAsset?.id === asset.id && (
+                        <div>Total: Rp. {(asset.harga * (selectedAsset?.quantity || 1)).toLocaleString('id-ID')}</div>
+                      )}
+                    </TableCell>
                     <TableCell>
                       <Typography variant="body2" sx={{ fontWeight: 500 }}>
                         {asset.shift?.namaShift}
