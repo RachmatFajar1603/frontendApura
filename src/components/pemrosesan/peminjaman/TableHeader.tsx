@@ -24,6 +24,7 @@ import { useDepartemen } from '@/lib/departemen/departemen';
 import { usePeminjaman } from '@/lib/pemrosesan/peminjaman';
 import { usePeminjamanFilter } from '@/contexts/PeminjamanContext';
 import { useUsers } from '@/hooks/use-user';
+import { Plus } from '@phosphor-icons/react/dist/ssr/Plus';
 
 const TableHeader: React.FC = () => {
   const {
@@ -144,6 +145,7 @@ const TableHeader: React.FC = () => {
                     variant="contained"
                     fullWidth
                     aria-label="Peminjaman"
+                    endIcon={<Plus fontSize="var(--icon-fontSize-md)" />}
                     sx={{
                       padding: '12px 16px',
                       minWidth: '120px',

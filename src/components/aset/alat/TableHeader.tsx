@@ -17,6 +17,7 @@ import { usePopover } from '@/hooks/use-popover';
 import { useUsers } from '@/hooks/use-user';
 
 import Modal from './modal';
+import { Plus } from '@phosphor-icons/react/dist/ssr/Plus';
 
 function TableHeader() {
   const {
@@ -132,6 +133,7 @@ function TableHeader() {
                   variant="contained"
                   fullWidth
                   aria-label="tambah"
+                  endIcon={<Plus fontSize="var(--icon-fontSize-md)" />}
                   sx={{
                     padding: '12px 16px',
                     minWidth: '120px',

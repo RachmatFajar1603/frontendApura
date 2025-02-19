@@ -14,6 +14,7 @@ import api from '@/lib/api';
 import { usePengembalian } from '@/lib/pemrosesan/pengembalian';
 import { usePengembalianFilter } from '@/contexts/PengembalianContext';
 import { useUsers } from '@/hooks/use-user';
+import { Plus } from '@phosphor-icons/react/dist/ssr/Plus';
 
 function TableHeader() {
   const {
@@ -138,6 +139,7 @@ function TableHeader() {
                     variant="contained"
                     fullWidth
                     aria-label="pengembalian"
+                    endIcon={<Plus fontSize="var(--icon-fontSize-md)" />}
                     sx={{
                       padding: '12px 16px',
                       minWidth: '120px',

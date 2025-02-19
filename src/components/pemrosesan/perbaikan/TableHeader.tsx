@@ -18,6 +18,7 @@ import { useDepartemen } from '@/lib/departemen/departemen';
 import { usePerbaikan } from '@/lib/pemrosesan/perbaikan';
 import { usePerbaikanFilter } from '@/contexts/PerbaikanContext';
 import { useUsers } from '@/hooks/use-user';
+import { Plus } from '@phosphor-icons/react/dist/ssr/Plus';
 
 function TableHeader() {
   const {
@@ -138,6 +139,7 @@ function TableHeader() {
                     variant="contained"
                     fullWidth
                     aria-label="Perbaikan"
+                    endIcon={<Plus fontSize="var(--icon-fontSize-md)" />}
                     sx={{
                       padding: '12px 16px',
                       minWidth: '120px',

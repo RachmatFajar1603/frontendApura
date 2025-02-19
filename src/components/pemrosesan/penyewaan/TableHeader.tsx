@@ -14,6 +14,7 @@ import { useDepartemen } from '@/lib/departemen/departemen';
 import { usePenyewaan } from '@/lib/pemrosesan/penyewaan';
 import { usePenyewaanFilter } from '@/contexts/PenyewaanContext';
 import { useUsers } from '@/hooks/use-user';
+import { Plus } from '@phosphor-icons/react/dist/ssr/Plus';
 
 const TableHeader: React.FC = () => {
   const {
@@ -135,6 +136,7 @@ const TableHeader: React.FC = () => {
                     variant="contained"
                     fullWidth
                     aria-label="penyewaan"
+                    endIcon={<Plus fontSize="var(--icon-fontSize-md)" />}
                     sx={{
                       padding: '12px 16px',
                       minWidth: '120px',
