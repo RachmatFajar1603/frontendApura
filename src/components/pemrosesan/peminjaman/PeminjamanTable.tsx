@@ -306,6 +306,9 @@ export default function PeminjamanTable() {
 
       document.body.removeChild(link);
       window.URL.revokeObjectURL(link.href);
+      setSnackbarMessage('Berhasil mengunduh PDF');
+      setSnackbarSeverity('success');
+      setSnackbarOpen(true);
     } catch (error) {
       console.error('Error downloading PDF:', error);
       setSnackbarMessage('Gagal mengunduh PDF');
@@ -445,30 +448,11 @@ export default function PeminjamanTable() {
                 <TableCell>{getJumlahAsetTersedia(peminjaman as Values)}</TableCell>
                 <TableCell>{peminjaman.deskripsiPenolakan || '-'}</TableCell>
                 <TableCell>
-                  {peminjaman.ttdPeminjam ? (
-                    <Link
-                      href={peminjaman.ttdPeminjam}
-                      download
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      aria-label="Download Tanda Tangan Peminjam" // Added aria-label for accessibility
-                    >
-                      <IconButton
-                        id="downloadButton" // Example of using an ID
-                        aria-label="Download Tanda Tangan Peminjam" // Example of aria-label
-                        title="Download Tanda Tangan" // Example of title
-                        sx={{
-                          padding: '12px', // Increased padding for better touch target size
-                          minWidth: '48px', // Minimum width for consistency
-                          minHeight: '48px', // Minimum height for consistency
-                        }}
-                      >
-                        <DownloadSimple />
-                      </IconButton>
-                    </Link>
-                  ) : (
-                    '-'
-                  )}
+                  {peminjaman.id ? (
+                    <IconButton onClick={() => handlePdfDownload(peminjaman.id)}>
+                      <DownloadSimple />
+                    </IconButton>
+                  ) : null}
                 </TableCell>
                 <TableCell>
                   {peminjaman.id ? (
