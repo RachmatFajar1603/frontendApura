@@ -14,7 +14,7 @@ function Footer() {
           color: '#A6AEBF',
         }}
       >
-        © 2025 APURA USK. All rights reserved.
+        © 2025 APURA FAJARALIFAN. All rights reserved.
       </Typography>
     </Box>
   );
