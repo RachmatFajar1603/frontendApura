@@ -133,7 +133,7 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
                 textShadow: '0 2px 4px rgba(0,0,0,0.05)',
               }}
             >
-              APURA FAJARALIFAN
+              APURA FMIPA
             </Typography>
             <Typography variant="h6" sx={{ color: '#333333', mb: 4, fontWeight: 500 }}>
               Sistem Peminjaman Penyewaan Ruangan dan Alat
@@ -182,7 +182,7 @@ export function Layout({ children }: LayoutProps): React.JSX.Element {
 
           <Box sx={{ mt: 4, textAlign: 'center' }}>
             <Typography variant="body2" sx={{ color: '#333333', fontWeight: 500 }}>
-              © 2025 APURA USK. All rights reserved.
+              © 2025 APURA FAJARALIFAN. All rights reserved.
             </Typography>
           </Box>
         </Stack>
