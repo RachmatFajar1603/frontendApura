@@ -19,6 +19,7 @@ import { useDepartemen } from '@/lib/departemen/departemen';
 import { useGedung } from '@/lib/gedung/gedung';
 import { useShift } from '@/lib/shift/shift';
 import { useUser } from '@/lib/UserManagement/UseUser';
+import { useUsers } from '@/hooks/use-user';
 
 interface EditModalProps {
   open: boolean;
@@ -46,6 +47,7 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
   const { postAlat, updateAlat } = useAlat();
   const { departemen, loading: loadingDepartemen } = useDepartemen();
   const { users: pengawasLab, loading: loadingPengawasLab } = useUser();
+  const { user } = useUsers();
   const { gedung, loading: loadingGedung } = useGedung();
   const { shift } = useShift();
   const [formattedHarga, setFormattedHarga] = React.useState('');
@@ -129,7 +131,7 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
           gedungId: values.gedungId,
           shiftId: values.shiftId,
           pengawasLabId: values.pengawasLabId,
-          harga: finalUpdateData.harga ? Number(finalUpdateData.harga) : undefined
+          harga: finalUpdateData.harga ? Number(finalUpdateData.harga) : undefined,
         });
       } else {
         // Convert harga to string before posting
@@ -152,7 +154,7 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
           departemenId: finalPostData.departemenId,
           gedungId: finalPostData.gedungId,
           shiftId: finalPostData.shiftId,
-          pengawasLabId: finalPostData.pengawasLabId
+          pengawasLabId: finalPostData.pengawasLabId,
         });
       }
 
@@ -218,7 +220,7 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
                   helperText={errors.pengawasLabId?.message}
                   fullWidth
                   margin="normal"
-                  disabled={loadingPengawasLab}
+                  disabled={user?.role === 'PENGAWAS_LAB' || loadingPengawasLab}
                 >
                   {loadingPengawasLab ? (
                     <MenuItem value="">Loading...</MenuItem>
@@ -363,7 +365,7 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
                   helperText={errors.departemenId?.message}
                   fullWidth
                   margin="normal"
-                  disabled={loadingDepartemen}
+                  disabled={user?.role === 'PENGAWAS_LAB' || loadingDepartemen}
                 >
                   {departemen.map((dep) => (
                     <MenuItem key={dep.id} value={dep.id}>
