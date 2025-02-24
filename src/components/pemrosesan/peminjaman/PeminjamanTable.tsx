@@ -448,11 +448,30 @@ export default function PeminjamanTable() {
                 <TableCell>{getJumlahAsetTersedia(peminjaman as Values)}</TableCell>
                 <TableCell>{peminjaman.deskripsiPenolakan || '-'}</TableCell>
                 <TableCell>
-                  {peminjaman.id ? (
-                    <IconButton onClick={() => handlePdfDownload(peminjaman.id)}>
-                      <DownloadSimple />
-                    </IconButton>
-                  ) : null}
+                  {peminjaman.ttdPeminjam ? (
+                    <Link
+                      href={peminjaman.ttdPeminjam}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Download Tanda Tangan Peminjam" // Added aria-label for accessibility
+                    >
+                      <IconButton
+                        id="downloadButton" // Example of using an ID
+                        aria-label="Download Tanda Tangan Peminjam" // Example of aria-label
+                        title="Download Tanda Tangan" // Example of title
+                        sx={{
+                          padding: '12px', // Increased padding for better touch target size
+                          minWidth: '48px', // Minimum width for consistency
+                          minHeight: '48px', // Minimum height for consistency
+                        }}
+                      >
+                        <DownloadSimple />
+                      </IconButton>
+                    </Link>
+                  ) : (
+                    '-'
+                  )}
                 </TableCell>
                 <TableCell>
                   {peminjaman.id ? (

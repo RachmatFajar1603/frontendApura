@@ -451,11 +451,30 @@ export default function PenyewaanTable() {
                 <TableCell>{sewa.deskripsiPenolakan || '-'}</TableCell>
                 <TableCell>Rp. {sewa.totalBiaya.toLocaleString('id-ID')}</TableCell>
                 <TableCell>
-                  {sewa.id ? (
-                    <IconButton onClick={() => handlePdfDownload(sewa.id)}>
-                      <DownloadSimple />
-                    </IconButton>
-                  ) : null}
+                  {sewa.buktiPembayaran ? (
+                    <Link
+                      href={sewa.buktiPembayaran}
+                      download
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label="Download Tanda Bukti Pembayaran"
+                    >
+                      <IconButton
+                        id="downloadButton"
+                        aria-label="Download Bukti Pembayaran"
+                        title="Download Bukti Pembayaran"
+                        sx={{
+                          padding: '12px',
+                          minWidth: '48px',
+                          minHeight: '48px',
+                        }}
+                      >
+                        <DownloadSimple />
+                      </IconButton>
+                    </Link>
+                  ) : (
+                    '-'
+                  )}
                 </TableCell>
                 <TableCell>
                   {sewa.ttdPenyewa ? (
