@@ -204,6 +204,10 @@ const EditPenyewaanForm: React.FC = () => {
     }
   }, [sewa, selectedAssetType, ruanganUmum, ruanganLab, alat]);
 
+  function formatRupiahTabel(angka: any) {
+    return `Rp ${angka.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.')}`;
+  }
+
   const handleNext = () => {
     setActiveStep((prevActiveStep) => prevActiveStep + 1);
   };
@@ -597,11 +601,12 @@ const EditPenyewaanForm: React.FC = () => {
                 primary={facility.nama}
                 secondary={
                   <>
-                    {facility.kode} - Jumlah: {facility.jumlah} - Status:{' '}
+                    {facility.kode} - Harga: {formatRupiahTabel(facility?.harga)} - Jumlah: {facility.jumlah} - Status:{' '}
                     {(facility.statusAset === 'TERSEDIA' ||
                       facility.statusAset === 'TIDAK_TERSEDIA' ||
                       facility.statusAset === 'SEDANG_DIPINJAM' ||
-                      facility.statusAset === 'SEDANG_DISEWA') && (
+                      facility.statusAset === 'SEDANG_DISEWA' ||
+                      facility.statusAset === 'SEDANG_DIPERBAIKI') && (
                       <Box
                         component="span"
                         sx={{
@@ -610,13 +615,17 @@ const EditPenyewaanForm: React.FC = () => {
                             facility.statusAset === 'SEDANG_DIPINJAM' ||
                             facility.statusAset === 'SEDANG_DISEWA'
                               ? '#388e3c'
-                              : '#d32f2f', // Hijau untuk TERSEDIA, SEDANG_DIPINJAM, dan SEDANG_DISEWA; Merah untuk TIDAK TERSEDIA
+                              : facility.statusAset === 'SEDANG_DIPERBAIKI'
+                                ? '#ed6c02'
+                                : '#d32f2f',
                           backgroundColor:
                             facility.statusAset === 'TERSEDIA' ||
                             facility.statusAset === 'SEDANG_DIPINJAM' ||
                             facility.statusAset === 'SEDANG_DISEWA'
                               ? '#e8f5e9'
-                              : '#ffebee', // Latar belakang hijau muda untuk TERSEDIA, SEDANG_DIPINJAM, dan SEDANG_DISEWA; merah muda untuk TIDAK TERSEDIA
+                              : facility.statusAset === 'SEDANG_DIPERBAIKI'
+                                ? '#fff3e0'
+                                : '#ffebee',
                           padding: '2px 8px',
                           borderRadius: '4px',
                         }}

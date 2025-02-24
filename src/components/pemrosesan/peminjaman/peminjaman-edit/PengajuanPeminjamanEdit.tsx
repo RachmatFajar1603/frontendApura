@@ -48,9 +48,9 @@ import { useRuanganUmum } from '@/lib/aset/RuanganUmum/useRuanganUmum';
 import { useDepartemen } from '@/lib/departemen/departemen';
 import { useFasilitas } from '@/lib/fasilitas/fasilitas';
 import { useGedung } from '@/lib/gedung/gedung';
+import { useCalendar } from '@/lib/pemrosesan/calendar';
 import { usePeminjaman } from '@/lib/pemrosesan/peminjaman';
 import { usePenyewaan } from '@/lib/pemrosesan/penyewaan';
-import { useCalendar } from '@/lib/pemrosesan/calendar';
 
 // import { useUsers } from '@/hooks/use-user';
 
@@ -534,7 +534,8 @@ const EditPeminjamanForm: React.FC = () => {
                     {(facility.statusAset === 'TERSEDIA' ||
                       facility.statusAset === 'TIDAK_TERSEDIA' ||
                       facility.statusAset === 'SEDANG_DIPINJAM' ||
-                      facility.statusAset === 'SEDANG_DISEWA') && (
+                      facility.statusAset === 'SEDANG_DISEWA' ||
+                      facility.statusAset === 'SEDANG_DIPERBAIKI') && (
                       <Box
                         component="span"
                         sx={{
@@ -543,13 +544,17 @@ const EditPeminjamanForm: React.FC = () => {
                             facility.statusAset === 'SEDANG_DIPINJAM' ||
                             facility.statusAset === 'SEDANG_DISEWA'
                               ? '#388e3c'
-                              : '#d32f2f', // Hijau untuk TERSEDIA, SEDANG_DIPINJAM, dan SEDANG_DISEWA; Merah untuk TIDAK TERSEDIA
+                              : facility.statusAset === 'SEDANG_DIPERBAIKI'
+                                ? '#ed6c02' 
+                                : '#d32f2f',
                           backgroundColor:
                             facility.statusAset === 'TERSEDIA' ||
                             facility.statusAset === 'SEDANG_DIPINJAM' ||
                             facility.statusAset === 'SEDANG_DISEWA'
                               ? '#e8f5e9'
-                              : '#ffebee', // Latar belakang hijau muda untuk TERSEDIA, SEDANG_DIPINJAM, dan SEDANG_DISEWA; merah muda untuk TIDAK TERSEDIA
+                              : facility.statusAset === 'SEDANG_DIPERBAIKI'
+                                ? '#fff3e0' 
+                                : '#ffebee',
                           padding: '2px 8px',
                           borderRadius: '4px',
                         }}

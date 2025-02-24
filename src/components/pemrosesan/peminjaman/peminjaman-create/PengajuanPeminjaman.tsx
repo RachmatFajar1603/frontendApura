@@ -425,7 +425,8 @@ function PeminjamanForm() {
                     {(facility.statusAset === 'TERSEDIA' ||
                       facility.statusAset === 'TIDAK_TERSEDIA' ||
                       facility.statusAset === 'SEDANG_DIPINJAM' ||
-                      facility.statusAset === 'SEDANG_DISEWA') && (
+                      facility.statusAset === 'SEDANG_DISEWA' ||
+                      facility.statusAset === 'SEDANG_DIPERBAIKI') && (
                       <Box
                         component="span"
                         sx={{
@@ -434,13 +435,17 @@ function PeminjamanForm() {
                             facility.statusAset === 'SEDANG_DIPINJAM' ||
                             facility.statusAset === 'SEDANG_DISEWA'
                               ? '#388e3c'
-                              : '#d32f2f',
+                              : facility.statusAset === 'SEDANG_DIPERBAIKI'
+                                ? '#ed6c02' 
+                                : '#d32f2f',
                           backgroundColor:
                             facility.statusAset === 'TERSEDIA' ||
                             facility.statusAset === 'SEDANG_DIPINJAM' ||
                             facility.statusAset === 'SEDANG_DISEWA'
                               ? '#e8f5e9'
-                              : '#ffebee',
+                              : facility.statusAset === 'SEDANG_DIPERBAIKI'
+                                ? '#fff3e0' 
+                                : '#ffebee',
                           padding: '2px 8px',
                           borderRadius: '4px',
                         }}
