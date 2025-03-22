@@ -45,6 +45,7 @@ interface Values {
   lantai: number;
   harga?: string;
   statusAset: string;
+  statusPinjamSewa: string;
   jumlah: number;
   shift?: any;
   laboratorium: string;
@@ -278,6 +279,7 @@ export default function AlatTable() {
               <TableCell>Lantai</TableCell>
               <TableCell>Harga</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell>Status Pemrosesan</TableCell>
               <TableCell>Jumlah</TableCell>
               <TableCell>Shift</TableCell>
               {user?.role && allowedRoles.includes(user.role) ? <TableCell>QR Code</TableCell> : null}
@@ -317,6 +319,29 @@ export default function AlatTable() {
                     }}
                   >
                     {item.statusAset}
+                  </Box>
+                </TableCell>
+                <TableCell>
+                  <Box
+                    sx={{
+                      display: 'inline-block',
+                      padding: '4px 12px',
+                      borderRadius: '16px',
+                      color:
+                        item.statusPinjamSewa === 'DAPAT_DIPINJAM'
+                          ? '#388e3c'
+                          : item.statusPinjamSewa === 'DAPAT_DISEWA'
+                            ? '#388e3c'
+                            : '#d32f2f',
+                      backgroundColor:
+                        item.statusPinjamSewa === 'DAPAT_DIPINJAM'
+                          ? '#e8f5e9'
+                          : item.statusPinjamSewa === 'DAPAT_DISEWA'
+                            ? '#e8f5e9'
+                            : '#ffebee',
+                    }}
+                  >
+                    {item.statusPinjamSewa}
                   </Box>
                 </TableCell>
                 <TableCell>{item.jumlah}</TableCell>

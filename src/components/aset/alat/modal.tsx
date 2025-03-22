@@ -36,6 +36,7 @@ interface Values {
   lantai: number;
   harga?: string;
   statusAset: string;
+  statusPinjamSewa: string;
   jumlah: number;
   shiftId?: any;
   pengawasLabId?: string;
@@ -72,6 +73,7 @@ const Modal: React.FC<AddAssetModalProps> = ({ open, handleClose }) => {
       lantai: 1,
       harga: '',
       statusAset: '',
+      statusPinjamSewa: '',
       jumlah: 1,
       shiftId: '',
       pengawasLabId: user?.id || '',
@@ -251,6 +253,26 @@ const Modal: React.FC<AddAssetModalProps> = ({ open, handleClose }) => {
                   <MenuItem value="TERSEDIA">Tersedia</MenuItem>
                   <MenuItem value="TIDAK_TERSEDIA">Tidak Tersedia</MenuItem>
                   <MenuItem value="SEDANG_DIPERBAIKI">Diperbaiki</MenuItem>
+                </TextField>
+              )}
+            />
+            <Controller
+              name="statusPinjamSewa"
+              control={control}
+              rules={{ required: 'Status pemrosesan diperlukan' }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  select
+                  label="Status Pinjam/Sewa"
+                  error={Boolean(errors.statusPinjamSewa)}
+                  helperText={errors.statusPinjamSewa?.message}
+                  fullWidth
+                  margin="normal"
+                >
+                  <MenuItem value="DAPAT_DIPINJAM">Dapat Dipinjam</MenuItem>
+                  <MenuItem value="DAPAT_DISEWA">Dapat Disewa</MenuItem>
+                  <MenuItem value="TIDAK_DAPAT_PINJAM_SEWA">Tidak Dapat Dipinjam dan Disewa</MenuItem>
                 </TextField>
               )}
             />

@@ -38,6 +38,7 @@ interface Values {
   lantai: number;
   harga?: string;
   statusAset: string;
+  statusPinjamSewa: string;
   jumlah: number;
   shiftId?: any;
   pengawasLabId?: string;
@@ -75,6 +76,7 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
       lantai: 1,
       harga: '',
       statusAset: '',
+      statusPinjamSewa: '',
       jumlah: 1,
       shiftId: '',
       pengawasLabId: '',
@@ -150,6 +152,7 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
           lantai: finalPostData.lantai,
           harga: finalPostData.harga ? Number(finalPostData.harga) : undefined,
           statusAset: finalPostData.statusAset,
+          statusPinjamSewa: finalPostData.statusPinjamSewa,
           jumlah: finalPostData.jumlah,
           departemenId: finalPostData.departemenId,
           gedungId: finalPostData.gedungId,
@@ -305,6 +308,29 @@ const EditModal: React.FC<EditModalProps> = ({ open, handleClose, initialData, o
                   margin="normal"
                 >
                   {['TERSEDIA', 'TIDAK_TERSEDIA', 'SEDANG_DIPERBAIKI'].map((status) => (
+                    <MenuItem key={status} value={status}>
+                      {status}
+                    </MenuItem>
+                  ))}
+                </TextField>
+              )}
+            />
+
+            <Controller
+              name="statusPinjamSewa"
+              control={control}
+              rules={{ required: 'Status Pinjam/Sewa diperlukan' }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  select
+                  label="Status Pinjam/Sewa"
+                  error={Boolean(errors.statusPinjamSewa)}
+                  helperText={errors.statusPinjamSewa?.message}
+                  fullWidth
+                  margin="normal"
+                >
+                  {['DAPAT_DIPINJAM', 'DAPAT_DISEWA', 'TIDAK_DAPAT_PINJAM_SEWA'].map((status) => (
                     <MenuItem key={status} value={status}>
                       {status}
                     </MenuItem>
