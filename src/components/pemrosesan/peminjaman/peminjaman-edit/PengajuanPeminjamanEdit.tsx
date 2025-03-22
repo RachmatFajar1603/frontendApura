@@ -63,6 +63,7 @@ interface AssetDetails {
   lantai: number;
   jumlah: number;
   statusAset: string;
+  statusPinjamSewa?: string;
   shift?: any;
 }
 
@@ -545,7 +546,7 @@ const EditPeminjamanForm: React.FC = () => {
                             facility.statusAset === 'SEDANG_DISEWA'
                               ? '#388e3c'
                               : facility.statusAset === 'SEDANG_DIPERBAIKI'
-                                ? '#ed6c02' 
+                                ? '#ed6c02'
                                 : '#d32f2f',
                           backgroundColor:
                             facility.statusAset === 'TERSEDIA' ||
@@ -553,7 +554,7 @@ const EditPeminjamanForm: React.FC = () => {
                             facility.statusAset === 'SEDANG_DISEWA'
                               ? '#e8f5e9'
                               : facility.statusAset === 'SEDANG_DIPERBAIKI'
-                                ? '#fff3e0' 
+                                ? '#fff3e0'
                                 : '#ffebee',
                           padding: '2px 8px',
                           borderRadius: '4px',
@@ -614,7 +615,7 @@ const EditPeminjamanForm: React.FC = () => {
         assets = ruanganLab as AssetDetails[];
         break;
       case 'alat':
-        assets = alat as AssetDetails[];
+        assets = (alat as AssetDetails[]).filter((asset) => asset.statusPinjamSewa === 'DAPAT_DIPINJAM');
         break;
     }
 
@@ -666,6 +667,7 @@ const EditPeminjamanForm: React.FC = () => {
               {selectedAssetType === 'alat' && <TableCell>Quantity</TableCell>}
               <TableCell>Shift</TableCell>
               <TableCell>Status</TableCell>
+              {selectedAssetType === 'alat' && <TableCell>Status Pemrosesan</TableCell>}
             </TableRow>
           </TableHead>
           <TableBody>
@@ -747,6 +749,31 @@ const EditPeminjamanForm: React.FC = () => {
                         {asset.statusAset}
                       </Box>
                     </TableCell>
+                    {selectedAssetType === 'alat' && (
+                      <TableCell>
+                        <Box
+                          sx={{
+                            display: 'inline-block',
+                            padding: '4px 12px',
+                            borderRadius: '16px',
+                            color:
+                              asset.statusPinjamSewa === 'DAPAT_DIPINJAM'
+                                ? '#388e3c'
+                                : asset.statusPinjamSewa === 'DAPAT_DISEWA'
+                                  ? '#388e3c'
+                                  : '#d32f2f',
+                            backgroundColor:
+                              asset.statusPinjamSewa === 'DAPAT_DIPINJAM'
+                                ? '#e8f5e9'
+                                : asset.statusPinjamSewa === 'DAPAT_DISEWA'
+                                  ? '#e8f5e9'
+                                  : '#ffebee',
+                          }}
+                        >
+                          {asset.statusPinjamSewa}
+                        </Box>
+                      </TableCell>
+                    )}
                   </TableRow>
                   {selectedAssetType === 'ruanganUmum' && isSelected ? (
                     <TableRow>

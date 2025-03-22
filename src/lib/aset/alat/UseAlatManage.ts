@@ -22,6 +22,7 @@ interface AlatManage {
   lantai: number;
   harga?: string;
   statusAset: string;
+  statusPinjamSewa: string;
   jumlah: number;
   created_at?: string;
   updated_at?: string;
