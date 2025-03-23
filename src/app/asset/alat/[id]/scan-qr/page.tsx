@@ -2,17 +2,7 @@
 
 import React from 'react';
 import { useParams } from 'next/navigation';
-import {
-  Box,
-  Card,
-  CardContent,
-  Chip,
-  CircularProgress,
-  Divider,
-  Grid,
-  Paper,
-  Typography,
-} from '@mui/material';
+import { Box, Card, CardContent, Chip, CircularProgress, Divider, Grid, Paper, Typography } from '@mui/material';
 import { MapPinLine } from '@phosphor-icons/react/dist/ssr/MapPinLine';
 import { QrCode } from '@phosphor-icons/react/dist/ssr/QrCode';
 import { Toolbox } from '@phosphor-icons/react/dist/ssr/Toolbox';
@@ -83,9 +73,25 @@ export default function AlatQRScanPage() {
     }
   };
 
+  const getStatusPemrosesanColor = (status: any) => {
+    switch (status) {
+      case 'DAPAT_DIPINJAM':
+        return '#3A7D44';
+      case 'DAPAT_DISEWA':
+        return '#3A7D44';
+      case 'TIDAK_DAPAT_PINJAM_SEWA':
+        return '#D70654';
+      default:
+        return 'default';
+    }
+  };
+
   return (
     <Box display="flex" justifyContent="center" alignItems="center" flex={1} p={2} sx={{ overflow: 'hidden' }}>
-      <Card sx={{ maxWidth: 600, width: '100%', borderRadius: 2, maxHeight: 'calc(100vh - 120px)', overflow: 'auto' }} elevation={4}>
+      <Card
+        sx={{ maxWidth: 600, width: '100%', borderRadius: 2, maxHeight: 'calc(100vh - 120px)', overflow: 'auto' }}
+        elevation={4}
+      >
         <CardContent>
           <Box display="flex" alignItems="center" mb={2}>
             <QrCode size={40} style={{ marginRight: 16, color: 'var(--primary-main)' }} />
@@ -138,6 +144,16 @@ export default function AlatQRScanPage() {
                         <Chip
                           label={alatDetail.statusAset}
                           sx={{ bgcolor: getStatusColor(alatDetail.statusAset), color: 'white' }}
+                          size="small"
+                        />
+                      </Box>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Box display="flex" alignItems="center" gap={1}>
+                        <strong>Status Pemrosesan:</strong>
+                        <Chip
+                          label={alatDetail.statusPinjamSewa}
+                          sx={{ bgcolor: getStatusPemrosesanColor(alatDetail.statusPinjamSewa), color: 'white' }}
                           size="small"
                         />
                       </Box>
